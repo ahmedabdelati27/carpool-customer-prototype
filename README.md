@@ -1,16 +1,21 @@
-# Carpool customer app · interactive prototype
+# Carpool app · interactive prototype (customer + driver)
 
-Clickable prototype of the customer app for an intercity carpooling service in Saudi Arabia (Arabic, RTL, iPhone 375×812).
+Clickable prototype of an intercity carpooling service in Saudi Arabia (Arabic, RTL, iPhone 375×812). One link opens an iPhone home screen with two app icons in the dock:
 
-The flow starts on an iPhone home screen. From there:
-
-1. Tap the app icon to see the splash, then onboarding.
-2. Search for a route, pick a date and a trip.
-3. Log in with a phone number, book seats and pay.
-4. Follow the booking: status, chat with the driver, cancel and refund, report a no-show, rate the driver.
-5. Use account, settings and support.
+- **Blue icon: customer app.** Splash, then onboarding.
+  1. Search for a route, pick a date and a trip.
+  2. Log in with a phone number, book seats and pay.
+  3. Follow the booking: status, chat with the driver, cancel and refund, report a no-show, rate the driver.
+  4. Use account, settings and support.
+- **Black icon: driver app** (in `driver/`). Splash, then login.
+  1. Sign up and activate the account (personal documents, vehicle, review).
+  2. Publish a trip.
+  3. Run a trip step by step with passenger attendance.
+  4. Follow earnings and transactions, ratings, notifications and the account.
 
 ## Try it
+
+### Customer app
 
 | Step | Value |
 |---|---|
@@ -19,9 +24,24 @@ The flow starts on an iPhone home screen. From there:
 | OTP | `1234` correct · `0000` expired · anything else wrong |
 | Payment | mada or Apple Pay succeed · "credit card" fails on purpose |
 
-Open a specific screen with `?preset=<name>`, for example `?preset=home-user`, `?preset=bk-detail-enroute` or `?preset=settings`. The full list is in `index.html` (`PRESETS`).
+### Driver app
 
-Add `&brand=accessible` to use the darker blue (#0062CC), which passes 4.5:1 contrast for small text.
+| Number | Account |
+|---|---|
+| `0501234567` | Approved driver with sample trips, bookings and earnings |
+| `055…` | New driver → sign up → activation steps |
+| `056…` | Activation under review (buttons simulate the admin's decision) |
+| `057…` | Activation rejected with a reason |
+| `058…` | Suspended account |
+
+The OTP is the same as in the customer app. Today's trip TR-3101 can be run end to end. «لم يحضر» unlocks after the 15-minute grace period, and there is a demo button to skip it.
+
+### Opening a specific screen
+
+- Customer app: add `?preset=<name>`, for example `?preset=home-user` or `?preset=bk-detail-enroute`.
+- Driver app: same parameter on `driver/`, for example `driver/?preset=run-attendance` or `driver/?preset=earnings`.
+
+Each app lists its presets in its `index.html` (`PRESETS`). Add `&brand=accessible` to use the darker blue (#0062CC), which passes 4.5:1 contrast for small text.
 
 All names, cars, plates, prices and times are sample data.
 
@@ -35,21 +55,27 @@ npx serve .
 
 ## How it is built
 
-The screens were designed in Claude's design canvas (`Main.dc.html`). `scripts/sync-from-canvas.js` turns that file into this site:
+Both apps were designed in Claude's design canvas (`Main.dc.html`, one per app). A script turns each canvas file into a static page:
 
 - `index.html` holds the screen template, the styles and the boot code.
 - `src/component.js` holds the prototype's state, sample data and handlers.
 - `src/dc-lite.js` is a small runtime that renders the template and re-renders on every state change. It uses [morphdom](https://github.com/patrick-steele-idem/morphdom) (MIT, vendored in `vendor/`).
 
-To update the site after editing the canvas:
+The driver app has its own copy of these files under `driver/`.
+
+To update the site after editing a canvas:
 
 ```bash
-node scripts/sync-from-canvas.js path/to/Main.dc.html
+node scripts/sync-from-canvas.js path/to/customer/Main.dc.html
+```
+
+```bash
+node driver/scripts/sync-from-canvas.js path/to/driver/Main.dc.html
 ```
 
 ## Notes
 
 - Font: the design uses thmanyah sans. Its license does not allow hosting the font files, so the site falls back to IBM Plex Sans Arabic from Google Fonts.
 - Images:
-  - The city photos, the iPhone home-screen mockup and the onboarding artwork were supplied by the designer for prototype use.
+  - The city photos, the iPhone home-screen mockup, the onboarding artwork, the car photo and the earnings card artwork were supplied by the designer for prototype use.
   - Check their usage rights before using them in production.

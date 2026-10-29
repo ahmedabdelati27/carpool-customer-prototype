@@ -64,6 +64,8 @@ ${withAssets(template)}
 <script src="src/component.js"></script>
 <script>
 (function () {
+  // The black icon on the launcher opens the driver app, which lives in driver/ on the same site.
+  window.DRIVER_APP_URL = 'driver/';
   // ?preset=<state> opens a specific screen; the default starts on the iPhone home screen.
   var PRESETS = ${JSON.stringify(presets)};
   var q = new URLSearchParams(location.search);
