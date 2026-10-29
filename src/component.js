@@ -12,7 +12,7 @@ var BRAND = { accessible: '#0062CC', original: '#007AFF' };
 var C = {
   brand: '#007AFF', soft: '#EBF4FF', ink: '#121212', body: '#4B4B4B', secondary: '#5D5D5D',
   placeholder: '#8A8A8A', stroke: '#E6E6E6', strokeMedium: '#D0D0D0', white: '#FFFFFF',
-  bgSecondary: '#FAFAFA', grey100: '#F5F5F5', error: '#ED1C24', errorText: '#B3261E'
+  bgSecondary: '#FAFAFA', grey100: '#F5F5F5', error: '#FF4E64', errorText: '#BF3B4B'
 };
 
 var CITIES = ['الرياض', 'جدة', 'مكة المكرمة', 'المدينة المنورة', 'الدمام', 'الخبر', 'الأحساء', 'القصيم', 'الطائف', 'أبها', 'تبوك', 'حائل', 'جازان', 'نجران', 'ينبع'];
@@ -241,16 +241,16 @@ function canReport(b) { return (b.status === 'confirmed' || b.status === 'enrout
 function canRate(b) { return b.status === 'completed' && !b.rating && b.passengers.some(function (p) { return p.status === 'active' && p.attendance === 'present'; }); }
 function statusInfo(b) {
   var partial = b.status !== 'cancelled' && activePax(b).length < b.passengers.length;
-  if (b.status === 'cancelled') return { label: 'ملغى', bg: '#FFECEB', dot: '#B3261E' };
+  if (b.status === 'cancelled') return { label: 'ملغى', bg: '#FFEDF0', dot: '#BF3B4B' };
   if (b.status === 'completed') return { label: 'مكتملة', bg: '#F5F5F5', dot: '#5D5D5D' };
   if (ACTIVE_RIDE[b.status]) return { label: (STATUS_STEPS.filter(function (s) { return s[0] === b.status; })[0] || [])[1], bg: '#EBF4FF', dot: '#007AFF' };
   if (partial) return { label: 'مؤكد · ملغى جزئياً', bg: '#FFF7E6', dot: '#D99100' };
-  return { label: 'مؤكد', bg: '#E9F9EE', dot: '#18A957' };
+  return { label: 'مؤكد', bg: '#E6FBF0', dot: '#03A853' };
 }
 var REFUND_STATUS = {
   processing: { label: 'قيد المعالجة', bg: '#FFF7E6', dot: '#D99100' },
-  completed: { label: 'مكتمل', bg: '#E9F9EE', dot: '#18A957' },
-  failed: { label: 'فشل', bg: '#FFECEB', dot: '#B3261E' }
+  completed: { label: 'مكتمل', bg: '#E6FBF0', dot: '#03A853' },
+  failed: { label: 'فشل', bg: '#FFEDF0', dot: '#BF3B4B' }
 };
 function sampleBookings() {
   var n = nowMin();
@@ -277,10 +277,10 @@ var NOTIF_STYLE = {
   message: { icon: 'isMsg', bg: '#EBF4FF', color: '#0062CC' },
   status: { icon: 'isCar', bg: '#EBF4FF', color: '#0062CC' },
   reminder: { icon: 'isTimer', bg: '#FFF7E6', color: '#121212' },
-  confirmed: { icon: 'isTick', bg: '#E9F9EE', color: '#18A957' },
-  refund: { icon: 'isMoney', bg: '#E9F9EE', color: '#18A957' },
-  refundFailed: { icon: 'isMoney', bg: '#FFECEB', color: '#B3261E' },
-  cancelled: { icon: 'isAlert', bg: '#FFECEB', color: '#B3261E' },
+  confirmed: { icon: 'isTick', bg: '#E6FBF0', color: '#03A853' },
+  refund: { icon: 'isMoney', bg: '#E6FBF0', color: '#03A853' },
+  refundFailed: { icon: 'isMoney', bg: '#FFEDF0', color: '#BF3B4B' },
+  cancelled: { icon: 'isAlert', bg: '#FFEDF0', color: '#BF3B4B' },
   report: { icon: 'isAlert', bg: '#FFF7E6', color: '#121212' },
   admin: { icon: 'isAdmin', bg: '#F5F5F5', color: '#4B4B4B' }
 };
@@ -296,7 +296,7 @@ var TICKET_TYPES = [
 var TICKET_STATUS = {
   'new': { label: 'جديدة', bg: '#EBF4FF', dot: '#007AFF', step: 0 },
   review: { label: 'قيد المراجعة', bg: '#FFF7E6', dot: '#D99100', step: 1 },
-  resolved: { label: 'تم الحل', bg: '#E9F9EE', dot: '#18A957', step: 2 },
+  resolved: { label: 'تم الحل', bg: '#E6FBF0', dot: '#03A853', step: 2 },
   closed: { label: 'مغلقة', bg: '#F5F5F5', dot: '#5D5D5D', step: 3 }
 };
 var TAKEN_PREFIX = '56';   // demo: numbers starting 56 already belong to another account
@@ -1135,9 +1135,9 @@ class Component extends DCLogic {
         chatLabel: bk.status === 'completed' || bk.status === 'cancelled' ? 'عرض سجل المحادثة (مغلقة)' : 'محادثة السائق',
         passengerCount: act.length,
         passengers: bk.passengers.map(function (p) {
-          var pill = p.status === 'cancelled' ? ['ملغى', '#FFECEB', C.errorText]
-            : p.attendance === 'noshow' ? ['لم يحضر', '#FFECEB', C.errorText]
-            : p.attendance === 'present' ? ['حضر', '#E9F9EE', C.ink]
+          var pill = p.status === 'cancelled' ? ['ملغى', '#FFEDF0', C.errorText]
+            : p.attendance === 'noshow' ? ['لم يحضر', '#FFEDF0', C.errorText]
+            : p.attendance === 'present' ? ['حضر', '#E6FBF0', C.ink]
             : null;
           return {
             name: p.name + (p.self ? ' (أنت)' : ''), phone: displayPhone(p.phone),
