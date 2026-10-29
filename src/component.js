@@ -1356,14 +1356,12 @@ class Component extends DCLogic {
     var navOn = screen === 'home' || screen === 'account' || screen === 'bookings';
     ['home', 'bookings', 'account'].forEach(function (k) {
       var on = activeTab === k;
-      nav[k + 'Color'] = on ? '#FFFFFF' : '#121212';
-      nav[k + 'Icon'] = on ? '#FFFFFF' : '#121212';
-      nav[k + 'Bg'] = on ? '#121212' : '#F2F2F2';
-      nav[k + 'Pad'] = on ? '0 18px' : '0';
+      nav[k + 'Icon'] = on ? action : '#4B4B4B';
+      nav[k + 'Bg'] = on ? '#EDEDED' : 'transparent';
       nav[k + 'Weight'] = on ? 700 : 500;
       nav[k + 'On'] = on;
       nav[k + 'Off'] = !on;
-      nav[k + 'Current'] = on ? 'page' : undefined;
+      nav[k + 'Current'] = on ? 'page' : 'false';
     });
 
     var otpBoxes = [0, 1, 2, 3].map(function (idx) {
