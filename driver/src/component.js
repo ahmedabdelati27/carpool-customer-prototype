@@ -1274,6 +1274,12 @@ class Component extends DCLogic {
         if (s.otpPurpose === 'changePhone') { self.setState({ screen: 'changePhone', pendingPhone: '', otp: '', otpError: '', attempts: 0 }); return; }
         self.setState({ screen: 'phone', phone: '', otp: '', otpError: '', attempts: 0 });
       },
+      // Demo helpers for the sign-up steps (new-driver number, OTP 1234, sample documents and vehicle)
+      simPhone: function () { if (!s.loading) self.setState({ phone: '0551234567', phoneError: '' }); },
+      simOtp: function () { if (s.otpError === 'locked' || s.loading) return; self.setState({ otp: '1234', otpError: '' }); self.verify('1234'); },
+      simSignup: function () { self.setState({ suName: 'محمد سعد الشهري', suNameErr: '', suAgree: true, suAgreeErr: false }); },
+      simPersonal: function () { self.setState({ docsDraft: { idType: 'national', idNumber: '1098765432', idExpiry: isoDay(870), licExpiry: isoDay(1200), idFile: 'national-id.jpg', licFile: 'driving-licence.jpg' }, docsErr: {} }); },
+      simVehicle: function () { self.setState({ vehDraft: approvedVehicle(), vehErr: {} }); },
       onSuName: function (e) { self.setState({ suName: e.target.value, suNameErr: '' }); },
       toggleSuAgree: function () { self.setState({ suAgree: !self.state.suAgree, suAgreeErr: false }); },
       openTermsSignup: function () { self.go('static', { staticKind: 'terms' }); },

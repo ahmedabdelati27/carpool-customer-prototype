@@ -1681,6 +1681,10 @@ class Component extends DCLogic {
       // Tapping the app icon shows the splash, then lands on home.
       driverHref: (typeof window !== 'undefined' && window.DRIVER_APP_URL) || 'https://claude.ai/artifact/Xo4hcTutN78xEDCEp8SVxy',
       driverTarget: typeof window !== 'undefined' && window.DRIVER_APP_URL ? '_self' : '_blank',
+      // Demo helpers for the sign-up steps (new-user number, OTP 1234, sample name)
+      simPhone: function () { if (!self.state.loading) self.setState({ phone: '0551234567', phoneError: '' }); },
+      simOtp: function () { if (self.state.otpError === 'locked' || self.state.loading) return; self.setState({ otp: '1234', otpError: '' }); self.verify('1234'); },
+      simProfile: function () { self.setState({ name: 'محمد سعد العتيبي', nameError: '', agree: true, agreeError: false }); },
       openApp: function () { self.setState({ screen: 'splash', sheet: '' }); self.later(1400, function () { self.setState({ screen: self.state.loggedIn ? 'home' : 'onboarding' }); }); },
       // Onboarding: "start" goes to phone login (back returns here), "browse" opens home as a guest.
       onbStart: function () { self.setState({ screen: 'phone', origin: 'onboarding', phoneError: '' }); },
