@@ -17,9 +17,11 @@ var C = {
   placeholder: '#8A8A8A', stroke: '#E6E6E6', strokeMedium: '#D0D0D0', white: '#FFFFFF', line: '#F0F0F0',
   bgSecondary: '#FAFAFA', grey100: '#F5F5F5', error: '#FF4E64', errorText: '#BF3B4B', success: '#03A853'
 };
+// Status colours from the designer's status components (background, text)
 var TONES = {
-  blue: { bg: '#EBF4FF', dot: '#007AFF' }, green: { bg: '#E6FBF0', dot: '#03A853' }, amber: { bg: '#FFF7E6', dot: '#D99100' },
-  red: { bg: '#FFEDF0', dot: '#BF3B4B' }, grey: { bg: '#F0F0F0', dot: '#8A8A8A' }, white: { bg: '#FFFFFF', dot: '#8A8A8A' }
+  blue: { bg: '#E6F2FF', dot: '#007AFF' }, purple: { bg: '#EFEBFA', dot: '#5C33CF' }, orange: { bg: '#FFF1E6', dot: '#FF6B00' },
+  amber: { bg: '#FEFCE8', dot: '#A16207' }, green: { bg: '#E6FBF0', dot: '#04D268' }, red: { bg: '#FFEDF0', dot: '#FF4E64' },
+  grey: { bg: '#F0F0F0', dot: '#5D5D5D' }, white: { bg: '#FFFFFF', dot: '#8A8A8A' }
 };
 
 // One-way routes enabled by the admin (BR-26, BR-32): base price per seat and driving hours.
@@ -717,8 +719,8 @@ class Component extends DCLogic {
     var tripStatus = function (t) {
       if (t.status === 'cancelled') return ['ملغاة', 'red'];
       if (t.status === 'completed') return ['مكتملة', 'green'];
-      if (t.status === 'current') return [STAGES[t.stage === 3 ? 3 : Math.max(0, t.stage - 1)], 'amber'];
-      return [bookedSeats(s, t.id) ? 'مؤكدة' : 'منشورة', 'blue'];
+      if (t.status === 'current') return [STAGES[t.stage === 3 ? 3 : Math.max(0, t.stage - 1)], 'orange'];
+      return bookedSeats(s, t.id) ? ['مؤكدة', 'blue'] : ['منشورة', 'purple'];
     };
     var tripView = function (t, dark) {
       var r = routeOf(t.from, t.to) || [t.from, t.to, t.price, 4];
@@ -767,7 +769,8 @@ class Component extends DCLogic {
         open: function () { if (cur || (nextTrip.day === 0 && nb)) self.go('run', { tripId: nextTrip.id }); else self.go('tripDetail', { tripId: nextTrip.id }); }
       });
     }
-    var monthStart = (function () { var x = dayAt(0); return 1 - x.getDate(); })();
+    // Rolling 30-day window: a calendar month would be empty on the 1st, which breaks the demo
+    var monthStart = -29;
     var earnOf = function (list) {
       return list.reduce(function (a, t) { var e = tripEarn(s, t); a.gross += e.gross; a.fee += e.fee; a.net += e.net; return a; }, { gross: 0, fee: 0, net: 0 });
     };
@@ -778,7 +781,7 @@ class Component extends DCLogic {
     var bankSet = !!(s.bank && s.bank.iban);
     var earn = {
       rate: Math.round(COMMISSION * 100) + '%', feeNeg: '⁦−' + money(periodSum.fee).replace(' ر.س', '') + '⁩' /* LRI…PDI keeps the minus on the number's left in RTL */, netPct: Math.round((1 - COMMISSION) * 100) + '%', netShare: (periodSum.gross ? Math.round(periodSum.net / periodSum.gross * 1000) / 10 : 0) + '%', shareAria: 'صافيك ' + Math.round((1 - COMMISSION) * 100) + '% وعمولة المنصة ' + Math.round(COMMISSION * 100) + '% من إجمالي الإيرادات',
-      net: money(periodSum.net), subline: 'من ' + money(periodSum.gross) + ' بعد عمولة المنصة ' + Math.round(COMMISSION * 100) + '%', netLabel: s.earnPeriod === 'month' ? 'صافي أرباح هذا الشهر' : 'صافي الأرباح منذ البداية', gross: money(periodSum.gross), fee: money(periodSum.fee), monthNet: money(earnOf(inMonth).net),
+      net: money(periodSum.net), subline: 'من ' + money(periodSum.gross) + ' بعد عمولة المنصة ' + Math.round(COMMISSION * 100) + '%', netLabel: s.earnPeriod === 'month' ? 'صافي أرباح آخر 30 يوماً' : 'صافي الأرباح منذ البداية', gross: money(periodSum.gross), fee: money(periodSum.fee), monthNet: money(earnOf(inMonth).net),
       pending: money(sumBy('pending')), payable: money(sumBy('payable')), paid: money(sumBy('paid')),
       needBank: !bankSet, bankText: bankSet ? (BANKS[s.bank.iban.slice(2, 4)] || 'حسابك') + ' · الحساب المنتهي بـ ' + s.bank.iban.slice(-4) : 'حسابك البنكي بعد إضافته'
     };
@@ -794,7 +797,7 @@ class Component extends DCLogic {
     });
 
     // ---------- latest transactions: trip earnings credited + bank transfers, newest first
-    var txStatus = { pending: ['معلّق', '#8A5A00', '#FFF7E6'], payable: ['مستحق للصرف', '#027E3E', '#E6FBF0'], paid: ['تم الصرف', '#4B4B4B', '#F0F0F0'] };
+    var txStatus = { pending: ['معلّق', TONES.amber.dot, TONES.amber.bg], payable: ['مستحق للصرف', TONES.green.dot, TONES.green.bg], paid: ['تم الصرف', TONES.grey.dot, TONES.grey.bg] };
     var txList = (s.earnPeriod === 'month' ? inMonth : completed).map(function (t) {
       var e = tripEarn(s, t), ts = txStatus[t.payout || 'payable'];
       return { at: dayAt(t.day).getTime() + t.dep * 60000, isTrip: true, isPayout: false, iconBg: '#E6FBF0', iconColor: '#03A853',
@@ -803,7 +806,7 @@ class Component extends DCLogic {
     }).concat(d.payouts.filter(function (p) { return s.earnPeriod !== 'month' || p.at >= dayAt(monthStart).setHours(0, 0, 0, 0); }).map(function (p) {
       var pd = new Date(p.at);
       return { at: p.at, isTrip: false, isPayout: true, iconBg: '#EBF4FF', iconColor: '#007AFF', title: 'تحويل إلى حسابك البنكي',
-        sub: pd.getDate() + ' ' + MONTHS[pd.getMonth()] + ' · ' + p.ref, amount: money(p.amount), amountColor: '#121212', status: 'تم التحويل', statusColor: '#0062CC', statusBg: '#EBF4FF',
+        sub: pd.getDate() + ' ' + MONTHS[pd.getMonth()] + ' · ' + p.ref, amount: money(p.amount), amountColor: '#121212', status: 'تم التحويل', statusColor: TONES.blue.dot, statusBg: TONES.blue.bg,
         open: function () { self.flash({}, 'حوالة ' + p.ref + ' بمبلغ ' + money(p.amount)); } };
     })).sort(function (a, b) { return b.at - a.at; }).slice(0, 6);
 
@@ -1015,7 +1018,7 @@ class Component extends DCLogic {
       var ctas = ['أنا في الطريق', 'وصلت لنقطة التجمع', 'بدء الرحلة', 'إنهاء الرحلة'];
       var blocked = stage === 2 && marked < rpax.length;
       run = { id: rt.id, from: rt.from, to: rt.to, date: dateLabel(rt.day) + ' · ' + fmtTime(rt.dep),
-        statusLabel: stage === 0 ? 'مؤكدة · لم تبدأ' : STAGES[stage === 3 ? 3 : stage - 1], dot: stage === 0 ? '#5EAEFF' : '#FFC107',
+        statusLabel: stage === 0 ? 'مؤكدة · لم تبدأ' : STAGES[stage === 3 ? 3 : stage - 1], pillBg: TONES[stage === 0 ? 'blue' : 'orange'].bg, pillColor: TONES[stage === 0 ? 'blue' : 'orange'].dot,
         target: stage >= 3 ? 'الوصول: ' + POINTS[rt.to][rt.dropoff].join('، ') : 'التجمع: ' + POINTS[rt.from][rt.pickup].join('، '),
         steps: STAGES.map(function (label, i) {
           var done = i < stage || (i === 2 && stage >= 3), cur = i === stage && !done;
@@ -1215,7 +1218,7 @@ class Component extends DCLogic {
       // home / trips / create
       home: { hello: 'مرحباً ' + s.driverName.split(' ')[0], upcoming: byTab.upcoming.length, current: byTab.current.length, done: byTab.completed.length,
         upcomingOpen: function () { self.go('trips', { tripsTab: 'upcoming' }); }, currentOpen: function () { self.go('trips', { tripsTab: 'current' }); }, doneOpen: function () { self.go('trips', { tripsTab: 'completed' }); },
-        wallet: money(earnOf(inMonth).net).replace(' ر.س', ''), walletAria: 'صافي أرباح هذا الشهر ' + money(earnOf(inMonth).net) + '، افتح الأرباح', bellAria: 'الإشعارات' + (unreadNotifs ? '، ' + unreadNotifs + ' غير مقروءة' : ''),
+        wallet: money(earnOf(inMonth).net).replace(' ر.س', ''), walletAria: 'صافي أرباح آخر 30 يوماً ' + money(earnOf(inMonth).net) + '، افتح الأرباح', bellAria: 'الإشعارات' + (unreadNotifs ? '، ' + unreadNotifs + ' غير مقروءة' : ''),
         hasNext: !!nextTrip, noNext: !nextTrip, nextTitle: nextTrip && nextTrip.status === 'current' ? 'رحلتك الجارية' : 'رحلتك القادمة', next: homeNext,
         bookingsText: activeBookings.length ? activeBookings.length + ' حجوزات مؤكدة · ' + seatsWord(activeSeats) : 'لا توجد حجوزات مؤكدة',
         bookingsSub: activeBookings.length ? 'على ' + filterTrips.length + ' رحلات قادمة' : 'تظهر هنا بعد دفع الركاب' },
@@ -1233,7 +1236,7 @@ class Component extends DCLogic {
       chatDraft: s.chatDraft, sendDisabled: !draftOk, sendBg: draftOk ? action : C.grey100, sendColor: draftOk ? C.white : C.placeholder, typingNow: !!s.typing,
 
       // money / ratings / notifs
-      earnPeriods: [['month', 'هذا الشهر'], ['all', 'الكل']].map(function (x) { var on = s.earnPeriod === x[0]; return { label: x[1], pressed: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', color: on ? '#121212' : '#5D5D5D', shadow: on ? '0 1px 3px rgba(18, 18, 18, 0.12)' : 'none', pick: function () { self.setState({ earnPeriod: x[0] }); } }; }),
+      earnPeriods: [['month', 'آخر 30 يوماً'], ['all', 'الكل']].map(function (x) { var on = s.earnPeriod === x[0]; return { label: x[1], pressed: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', color: on ? '#121212' : '#5D5D5D', shadow: on ? '0 1px 3px rgba(18, 18, 18, 0.12)' : 'none', pick: function () { self.setState({ earnPeriod: x[0] }); } }; }),
       earnTabs: [['ledger', 'سجل الرحلات'], ['payouts', 'عمليات الصرف']].map(function (x) { var on = s.earnTab === x[0]; return { label: x[1], pressed: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', color: on ? '#121212' : '#5D5D5D', shadow: on ? '0 1px 3px rgba(18, 18, 18, 0.12)' : 'none', pick: function () { self.setState({ earnTab: x[0] }); } }; }),
       txns: txList, txHasItems: txList.length > 0, txEmpty: txList.length === 0,
       rt: rtv, reportReasons: REPORT_REASONS.map(function (x) { return Object.assign(chipStyle(s.reportReason === x[0], action), { label: x[1], pick: function () { self.setState({ reportReason: x[0] }); } }); }),

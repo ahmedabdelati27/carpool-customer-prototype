@@ -241,16 +241,16 @@ function canReport(b) { return (b.status === 'confirmed' || b.status === 'enrout
 function canRate(b) { return b.status === 'completed' && !b.rating && b.passengers.some(function (p) { return p.status === 'active' && p.attendance === 'present'; }); }
 function statusInfo(b) {
   var partial = b.status !== 'cancelled' && activePax(b).length < b.passengers.length;
-  if (b.status === 'cancelled') return { label: 'ملغى', bg: '#FFEDF0', dot: '#BF3B4B' };
-  if (b.status === 'completed') return { label: 'مكتملة', bg: '#F5F5F5', dot: '#5D5D5D' };
-  if (ACTIVE_RIDE[b.status]) return { label: (STATUS_STEPS.filter(function (s) { return s[0] === b.status; })[0] || [])[1], bg: '#EBF4FF', dot: '#007AFF' };
-  if (partial) return { label: 'مؤكد · ملغى جزئياً', bg: '#FFF7E6', dot: '#D99100' };
-  return { label: 'مؤكد', bg: '#E6FBF0', dot: '#03A853' };
+  if (b.status === 'cancelled') return { label: 'ملغى', bg: '#FFEDF0', dot: '#FF4E64' };
+  if (b.status === 'completed') return { label: 'مكتملة', bg: '#E6FBF0', dot: '#04D268' };
+  if (ACTIVE_RIDE[b.status]) return { label: (STATUS_STEPS.filter(function (s) { return s[0] === b.status; })[0] || [])[1], bg: '#FFF1E6', dot: '#FF6B00' };
+  if (partial) return { label: 'مؤكد · ملغى جزئياً', bg: '#FEFCE8', dot: '#A16207' };
+  return { label: 'مؤكد', bg: '#E6F2FF', dot: '#007AFF' };
 }
 var REFUND_STATUS = {
-  processing: { label: 'قيد المعالجة', bg: '#FFF7E6', dot: '#D99100' },
-  completed: { label: 'مكتمل', bg: '#E6FBF0', dot: '#03A853' },
-  failed: { label: 'فشل', bg: '#FFEDF0', dot: '#BF3B4B' }
+  processing: { label: 'قيد المعالجة', bg: '#FEFCE8', dot: '#A16207' },
+  completed: { label: 'مكتمل', bg: '#E6FBF0', dot: '#04D268' },
+  failed: { label: 'فشل', bg: '#FFEDF0', dot: '#FF4E64' }
 };
 function sampleBookings() {
   var n = nowMin();
@@ -267,7 +267,9 @@ function sampleBookings() {
   failed.passengers[0].status = 'cancelled';
   var ff = Math.round(failed.total * LATE_FEE_RATE);
   failed.refunds = [{ ref: 'RF-46877-1', seats: 1, gross: failed.total, fee: ff, net: failed.total - ff, status: 'failed' }];
-  return [upcoming, soon, enroute, late, completed, cancelled, failed];
+  var rated = makeBooking('BK-46034', tripAt('جدة', 'الرياض', -16, 420), [me('present')], [], 'applepay', 'completed');
+  rated.rating = { stars: 5, comment: '' };
+  return [upcoming, soon, enroute, late, completed, cancelled, failed, rated];
 }
 
 // ---- chat (CUS-09) and notifications (CUS-12) ----
@@ -294,10 +296,10 @@ var TICKET_TYPES = [
   ['objection', 'اعتراض على حجز', 'مثل تسجيل «لم يحضر» أو مبلغ مسترد غير صحيح']
 ];
 var TICKET_STATUS = {
-  'new': { label: 'جديدة', bg: '#EBF4FF', dot: '#007AFF', step: 0 },
-  review: { label: 'قيد المراجعة', bg: '#FFF7E6', dot: '#D99100', step: 1 },
-  resolved: { label: 'تم الحل', bg: '#E6FBF0', dot: '#03A853', step: 2 },
-  closed: { label: 'مغلقة', bg: '#F5F5F5', dot: '#5D5D5D', step: 3 }
+  'new': { label: 'جديدة', bg: '#E6F2FF', dot: '#007AFF', step: 0 },
+  review: { label: 'قيد المراجعة', bg: '#FEFCE8', dot: '#A16207', step: 1 },
+  resolved: { label: 'تم الحل', bg: '#E6FBF0', dot: '#04D268', step: 2 },
+  closed: { label: 'مغلقة', bg: '#F0F0F0', dot: '#5D5D5D', step: 3 }
 };
 var TAKEN_PREFIX = '56';   // demo: numbers starting 56 already belong to another account
 var FAQ = [
@@ -433,7 +435,7 @@ var PRESETS = {
 
 var DESTINATION = { onboarding: 'home', trip: 'booking', account: 'account', bookings: 'bookings', chats: 'chats', home: 'home' };
 // Screens whose white top bar sits right under the status bar.
-var WHITE_HEADER = { results: 1, trip: 1, booking: 1, payment: 1, bookingDetail: 1, cancel: 1, notifications: 1, profile: 1, deleteAccount: 1, support: 1, ticketNew: 1, ticket: 1, faq: 1 };
+var WHITE_HEADER = { bookings: 1, results: 1, trip: 1, booking: 1, payment: 1, bookingDetail: 1, cancel: 1, notifications: 1, profile: 1, deleteAccount: 1, support: 1, ticketNew: 1, ticket: 1, faq: 1 };
 var GREY_SCREENS = { home: 1, search: 1, settings: 1, results: 1, trip: 1, booking: 1, payment: 1, chats: 1, account: 1, bookings: 1, bookingDetail: 1, cancel: 1, notifications: 1, deleteAccount: 1, support: 1, ticketNew: 1, ticket: 1, faq: 1 };
 
 function bookingFromState(s, ref) {
@@ -1057,33 +1059,40 @@ class Component extends DCLogic {
     });
 
     // my bookings
-    var tabDefs = [['upcoming', 'القادمة'], ['current', 'الحالية'], ['past', 'السابقة']];
+    // The running trip is pinned on top of «القادمة» instead of having its own tab
+    var listTab = s.bookingsTab === 'past' ? 'past' : 'upcoming';
+    var listOf = function (b) { return tabOf(b) === 'past' ? 'past' : 'upcoming'; };
+    var tabDefs = [['upcoming', 'القادمة'], ['past', 'السابقة']];
     var bookingTabs = tabDefs.map(function (t) {
-      return Object.assign(chipStyle(s.bookingsTab === t[0], action), { label: t[1], pick: function () { self.setState({ bookingsTab: t[0] }); } });
+      var on = listTab === t[0];
+      return {
+        label: t[1], color: on ? action : C.secondary, weight: on ? 700 : 500, line: on ? action : 'transparent', pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ bookingsTab: t[0] }); }
+      };
     });
-    bookingTabs.forEach(function (t, i) {
-      var n = s.bookings.filter(function (b) { return tabOf(b) === tabDefs[i][0]; }).length;
-      if (n) t.label = t.label + ' (' + n + ')';
-    });
-    var tabItems = s.bookings.filter(function (b) { return tabOf(b) === s.bookingsTab; }).sort(function (a, b) {
+    var tabItems = s.bookings.filter(function (b) { return listOf(b) === listTab; }).sort(function (a, b) {
+      var ca = tabOf(a) === 'current' ? 0 : 1, cb = tabOf(b) === 'current' ? 0 : 1;
+      if (ca !== cb) return ca - cb;
       var ka = a.trip.dateIdx * 1440 + a.trip.depMin, kb = b.trip.dateIdx * 1440 + b.trip.depMin;
-      return s.bookingsTab === 'past' ? kb - ka : ka - kb;
+      return listTab === 'past' ? kb - ka : ka - kb;
     });
-    var bookingCards = tabItems.map(function (b) {
+    var hasCurrent = tabItems.some(function (b) { return tabOf(b) === 'current'; });
+    var bookingCards = tabItems.map(function (b, i) {
       var si = statusInfo(b);
-      var failedRefund = b.refunds.some(function (r) { return r.status === 'failed'; });
-      var note = canRate(b) ? ['بانتظار تقييمك للسائق', action]
-        : failedRefund ? ['تعذّر استرداد المبلغ، سنعيد المحاولة', C.errorText]
-        : b.report ? ['بلاغ عدم حضور السائق قيد المراجعة', C.body]
-        : canReport(b) ? ['لم يصل السائق؟ يمكنك الإبلاغ الآن', C.ink]
-        : null;
+      var isCurrent = tabOf(b) === 'current';
+      var prevCurrent = i > 0 && tabOf(tabItems[i - 1]) === 'current';
+      var header = !hasCurrent ? '' : i === 0 ? 'الحالية' : prevCurrent && !isCurrent ? 'القادمة' : '';
+      var toRate = canRate(b), stars = b.rating ? b.rating.stars : 0;
       return {
         ref: b.ref, status: si.label, pillBg: si.bg, pillDot: si.dot,
         from: b.trip.from, to: b.trip.to, dep: b.trip.dep, arr: b.trip.arr, date: dateLabel(b.trip.dateIdx),
         seats: seatsWord(activePax(b).length || b.passengers.length), total: money(b.total),
         dateColor: C.secondary, duration: b.trip.duration,
         driverName: b.trip.driver.name, driverRating: b.trip.driver.rating, car: b.trip.driver.car + ' · ' + b.trip.driver.plate,
-        hasNote: !!note, note: note ? note[0] : '', noteColor: note ? note[1] : C.ink,
+        hasRating: toRate || !!b.rating, rateLabel: b.rating ? 'تقييمك للسائق' : 'قيّم السائق',
+        rateAria: b.rating ? 'تقييمك ' + stars + ' من 5' : 'لم تقيّم السائق بعد',
+        rateStars: [1, 2, 3, 4, 5].map(function (n) { var on = n <= stars; return { fill: on ? '#F4B400' : 'none', color: on ? '#F4B400' : C.strokeMedium }; }),
+        isCurrent: isCurrent, notCurrent: !isCurrent, hasHeader: !!header, header: header, headerPad: i === 0 ? '0' : '8px',
         aria: 'حجز ' + b.ref + '، ' + b.trip.from + ' إلى ' + b.trip.to + '، ' + si.label,
         open: function () { self.setState({ screen: 'bookingDetail', detailRef: b.ref, sheet: '' }); }
       };
@@ -1135,9 +1144,9 @@ class Component extends DCLogic {
         chatLabel: bk.status === 'completed' || bk.status === 'cancelled' ? 'عرض سجل المحادثة (مغلقة)' : 'محادثة السائق',
         passengerCount: act.length,
         passengers: bk.passengers.map(function (p) {
-          var pill = p.status === 'cancelled' ? ['ملغى', '#FFEDF0', C.errorText]
-            : p.attendance === 'noshow' ? ['لم يحضر', '#FFEDF0', C.errorText]
-            : p.attendance === 'present' ? ['حضر', '#E6FBF0', C.ink]
+          var pill = p.status === 'cancelled' ? ['ملغى', '#FFEDF0', '#FF4E64']
+            : p.attendance === 'noshow' ? ['لم يحضر', '#FFEDF0', '#FF4E64']
+            : p.attendance === 'present' ? ['حضر', '#E6FBF0', '#04D268']
             : null;
           return {
             name: p.name + (p.self ? ' (أنت)' : ''), phone: displayPhone(p.phone),
@@ -1346,9 +1355,8 @@ class Component extends DCLogic {
     });
     var emptyCopy = {
       upcoming: ['لا توجد حجوزات قادمة', 'ابحث عن رحلة من الصفحة الرئيسية واحجز مقعدك.'],
-      current: ['لا توجد رحلة جارية الآن', 'تظهر هنا رحلتك عند بدء تنفيذها.'],
       past: ['لا توجد حجوزات سابقة', 'تظهر هنا الرحلات المكتملة والملغاة.']
-    }[s.bookingsTab];
+    }[listTab];
 
     // nav
     var activeTab = screen === 'home' ? 'home' : screen === 'account' ? 'account' : screen === 'bookings' ? 'bookings' : '';
@@ -1593,7 +1601,7 @@ class Component extends DCLogic {
       tabEmpty: bookingCards.length === 0,
       tabEmptyTitle: emptyCopy[0],
       tabEmptyBody: emptyCopy[1],
-      tabEmptyCta: s.bookingsTab === 'upcoming',
+      tabEmptyCta: listTab === 'upcoming',
 
       // sheets
       gateTitle: gateTitles[s.origin] || gateTitles.home,
