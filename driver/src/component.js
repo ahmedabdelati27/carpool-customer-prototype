@@ -542,8 +542,7 @@ class Component extends DCLogic {
   savePersonal() {
     var d = this.state.docsDraft, e = {};
     if (!/^\d{10}$/.test(d.idNumber)) e.idNumber = d.idNumber ? 'short' : 'empty';
-    else if (d.idType === 'national' && d.idNumber.charAt(0) !== '1') e.idNumber = 'nationalPrefix';
-    else if (d.idType === 'iqama' && d.idNumber.charAt(0) !== '2') e.idNumber = 'iqamaPrefix';
+    else if (d.idNumber.charAt(0) !== '1' && d.idNumber.charAt(0) !== '2') e.idNumber = 'prefix';
     var ie = daysUntil(d.idExpiry), le = daysUntil(d.licExpiry);
     if (ie === null) e.idExpiry = 'empty'; else if (ie < 0) e.idExpiry = 'past';
     if (le === null) e.licExpiry = 'empty'; else if (le < 0) e.licExpiry = 'past';
@@ -878,7 +877,7 @@ class Component extends DCLogic {
     // ---------- activation stepper (personal → vehicle → review)
     var wizIdx = { docsPersonal: 0, docsVehicle: 1, actReview: 2 }[screen];
     var wizOn = s.docsMode !== 'update' && wizIdx !== undefined;
-    var wiz = { show: wizOn, showBack: s.docsMode === 'update',
+    var wiz = { show: wizOn, showBack: s.docsMode === 'update' || wizOn,
       personalLabel: s.docsMode === 'update' ? 'إرسال التحديث للمراجعة' : 'التالي', vehicleLabel: s.docsMode === 'update' ? 'إرسال التحديث للمراجعة' : 'التالي',
       submitLabel: st === 'rejected' ? 'إعادة إرسال الطلب' : 'إرسال طلب التفعيل',
       steps: ['البيانات الشخصية', 'المركبة', 'المراجعة والإرسال'].map(function (label, i) {
@@ -895,7 +894,7 @@ class Component extends DCLogic {
 
     // ---------- documents / vehicle forms
     var dd0 = s.docsDraft || s.docs || blankDocs(), de = s.docsErr || {};
-    var idErr = { empty: 'أدخل رقم الهوية أو الإقامة', short: 'الرقم يتكون من 10 أرقام', nationalPrefix: 'رقم الهوية الوطنية يبدأ بـ 1', iqamaPrefix: 'رقم الإقامة يبدأ بـ 2' };
+    var idErr = { empty: 'أدخل رقم الهوية أو الإقامة', short: 'الرقم يتكون من 10 أرقام', prefix: 'رقم الهوية الوطنية يبدأ بـ 1، ورقم الإقامة يبدأ بـ 2' };
     var dateErr = { empty: 'اختر تاريخ الانتهاء', past: 'المستند منتهي. حدّثه قبل المتابعة' };
     var docs = { idNumber: dd0.idNumber, idExpiry: dd0.idExpiry, licExpiry: dd0.licExpiry, idFile: dd0.idFile, licFile: dd0.licFile,
       isUpdate: s.docsMode === 'update', saveLabel: s.docsMode === 'update' ? 'إرسال التحديث للمراجعة' : 'حفظ',
@@ -1241,7 +1240,7 @@ class Component extends DCLogic {
       c: { action: action },
       appClass: navOn ? 'with-nav' : '',
       pageBg: blue ? '#121212' : GREY[screen] ? C.bgSecondary : C.white,
-      statusBg: blue ? '#121212' : GREY[screen] && !{ tripDetail: 1, create: 1, run: 1, bookingDetail: 1 }[screen] ? C.bgSecondary : C.white,
+      statusBg: blue ? '#121212' : GREY[screen] && !{ tripDetail: 1, create: 1, run: 1, bookingDetail: 1, docsPersonal: 1, docsVehicle: 1, actReview: 1 }[screen] ? C.bgSecondary : C.white,
       statusFg: blue ? '#FFFFFF' : '#000000',
       isSplash: screen === 'splash', isPhone: screen === 'phone', isOtp: screen === 'otp', isSignup: screen === 'signup',
       isActivation: screen === 'activation', isDocsPersonal: screen === 'docsPersonal', isDocsVehicle: screen === 'docsVehicle', isActReview: screen === 'actReview',
@@ -1355,12 +1354,18 @@ class Component extends DCLogic {
       docsBack: function () {
         if (s.docsMode === 'update') { self.back('account'); return; }
         if (screen === 'docsVehicle') self.setState({ screen: 'docsPersonal', docsDraft: clone(s.docs || blankDocs()), docsErr: {} });
+        if (screen === 'actReview') self.setState({ screen: 'docsVehicle', vehDraft: clone(s.veh || blankVehicle()), vehErr: {} });
+        // first step goes back to the account status page, where the driver can also log out
+        if (screen === 'docsPersonal') self.setState({ screen: 'activation' });
       },
       reviewBack: function () { self.setState({ screen: 'docsVehicle', vehDraft: clone(s.veh || blankVehicle()), vehErr: {} }); },
       reviewEditPersonal: function () { self.setState({ screen: 'docsPersonal', docsDraft: clone(s.docs || blankDocs()), docsErr: {} }); },
       reviewEditVehicle: function () { self.setState({ screen: 'docsVehicle', vehDraft: clone(s.veh || blankVehicle()), vehErr: {} }); },
       editRejected: function () { self.setState({ screen: 'docsVehicle', docsMode: 'activation', vehDraft: clone(s.veh || blankVehicle()), vehErr: {}, sheet: '' }); },
-      onIdNumber: function (e) { self.setState({ docsDraft: Object.assign(clone(dd0), { idNumber: toWesternDigits(e.target.value).replace(/\D/g, '').slice(0, 10) }), docsErr: Object.assign({}, de, { idNumber: '' }) }); },
+      onIdNumber: function (e) {
+        var n = toWesternDigits(e.target.value).replace(/\D/g, '').slice(0, 10);
+        self.setState({ docsDraft: Object.assign(clone(dd0), { idNumber: n, idType: n.charAt(0) === '2' ? 'iqama' : 'national' }), docsErr: Object.assign({}, de, { idNumber: '' }) });
+      },
       onIdExpiry: function (e) { self.setState({ docsDraft: Object.assign(clone(dd0), { idExpiry: e.target.value }), docsErr: Object.assign({}, de, { idExpiry: '' }) }); },
       onLicExpiry: function (e) { self.setState({ docsDraft: Object.assign(clone(dd0), { licExpiry: e.target.value }), docsErr: Object.assign({}, de, { licExpiry: '' }) }); },
       uploadId: function () { self.setState({ docsDraft: Object.assign(clone(dd0), { idFile: dd0.idFile ? 'national-id-2.jpg' : 'national-id.jpg' }), docsErr: Object.assign({}, de, { idFile: false }) }); },
