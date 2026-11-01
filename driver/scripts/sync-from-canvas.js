@@ -41,6 +41,12 @@ const page = `<!doctype html>
 <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml">
 ${withAssets(helmet.trim())}
 <style>
+/* thmanyah sans, the design font (files in /fonts). IBM Plex Sans Arabic stays as the fallback. */
+@font-face{font-family:"thmanyah sans";src:url("../fonts/thmanyahsans-Light.otf") format("opentype");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah sans";src:url("../fonts/thmanyahsans-Regular.otf") format("opentype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah sans";src:url("../fonts/thmanyahsans-Medium.otf") format("opentype");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah sans";src:url("../fonts/thmanyahsans-Bold.otf") format("opentype");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah sans";src:url("../fonts/thmanyahsans-Black.otf") format("opentype");font-weight:900;font-style:normal;font-display:swap}
 html,body{height:100%}
 body{margin:0;background:#E9EDF3;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #stage{position:relative;width:375px;height:812px;flex-shrink:0;transform-origin:center center}

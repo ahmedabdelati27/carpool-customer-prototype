@@ -75,7 +75,7 @@ node driver/scripts/sync-from-canvas.js path/to/driver/Main.dc.html
 
 ## Notes
 
-- Font: the design uses thmanyah sans. Its license does not allow hosting the font files, so the site falls back to IBM Plex Sans Arabic from Google Fonts.
+- Font: the design uses thmanyah sans, loaded from `fonts/` (Light 300, Regular 400, Medium 500, Bold 700, Black 900). IBM Plex Sans Arabic from Google Fonts stays as the fallback.
 - Images:
   - The city photos, the iPhone home-screen mockup, the onboarding artwork, the car photo and the earnings card artwork were supplied by the designer for prototype use.
   - Check their usage rights before using them in production.
