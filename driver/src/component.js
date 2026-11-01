@@ -313,6 +313,7 @@ function presetState(name) {
   return s;
 }
 
+var SIM_PASSENGERS = [['سارة العتيبي', '503118842'], ['فيصل القرني', '556120934'], ['ريم الشهري', '541239870'], ['عمر البقمي', '508823410']];
 function tripById(s, id) { return (s.data ? s.data.trips : []).filter(function (t) { return t.id === id; })[0]; }
 function bookingByRef(s, ref) { return (s.data ? s.data.bookings : []).filter(function (b) { return b.ref === ref; })[0]; }
 function activePax(b) { return b.pax.filter(function (p) { return !p.cancelled; }); }
@@ -431,6 +432,44 @@ class Component extends DCLogic {
     var patch = Object.assign({ data: d }, extra || {});
     if (msg) this.flash(patch, msg); else this.setState(patch);
   }
+  // Demo helper: events that come from outside the driver (passengers, the platform) so the whole flow can be shown
+  simEvent(kind) {
+    var s = this.state, d = clone(s.data), t = tripById(s, s.tripId);
+    if (kind === 'newBooking' && t) {
+      var who = SIM_PASSENGERS[d.bookings.length % SIM_PASSENGERS.length];
+      var ref = 'BK-5' + String(1000 + Math.floor(Math.random() * 9000));
+      d.bookings = d.bookings.concat([{ ref: ref, tripId: t.id, owner: who[0], pax: [pax(who[0], who[1])], bags: 1, status: 'confirmed', at: Date.now() }]);
+      this.addNotif(d, 'booking', ref, 'حجز جديد مؤكد', who[0] + ' حجز مقعداً واحداً في رحلة ' + t.from + ' ← ' + t.to + ' ' + dateLabel(t.day));
+      this.flash({ data: d }, 'وصلك إشعار: حجز جديد من ' + who[0]);
+    }
+    if (kind === 'paxCancel' && t) {
+      var last = tripBookings(s, t.id).filter(function (b) { return b.status === 'confirmed'; }).pop();
+      if (!last) return;
+      d.bookings = d.bookings.map(function (b) {
+        return b.ref === last.ref ? Object.assign({}, b, { status: 'cancelled', byDriver: false, pax: b.pax.map(function (p) { return Object.assign({}, p, { cancelled: true }); }) }) : b;
+      });
+      this.addNotif(d, 'cancel', last.ref, 'إلغاء حجز', 'ألغى ' + last.owner + ' حجزه في رحلة ' + t.from + ' ← ' + t.to + '. المقاعد متاحة للحجز مجدداً');
+      this.flash({ data: d }, 'وصلك إشعار: ' + last.owner + ' ألغى حجزه');
+    }
+    if (kind === 'payable' || kind === 'transfer') {
+      var from = kind === 'payable' ? 'pending' : 'payable', to = kind === 'payable' ? 'payable' : 'paid', sum = 0;
+      d.trips = d.trips.map(function (x) {
+        if (x.status !== 'completed' || (x.payout || 'payable') !== from) return x;
+        sum += tripEarn(s, x).net;
+        return Object.assign({}, x, { payout: to, hold: '' });
+      });
+      if (kind === 'payable') {
+        this.addNotif(d, 'money', '', 'مستحقات جاهزة للصرف', 'انتهت فترة الاعتراض، وأصبح ' + money(sum) + ' مستحقاً للصرف');
+        this.flash({ data: d }, 'وصلك إشعار: ' + money(sum) + ' أصبح مستحقاً للصرف');
+      } else {
+        var trf = 'TRF-' + String(10000 + Math.floor(Math.random() * 90000));
+        d.payouts = [{ ref: trf, amount: sum, at: Date.now(), status: 'paid' }].concat(d.payouts);
+        this.addNotif(d, 'money', '', 'تم صرف مستحقات', 'حوّلنا ' + money(sum) + ' إلى حسابك المنتهي بـ ' + s.bank.iban.slice(-4) + '. المرجع ' + trf);
+        this.flash({ data: d }, 'وصلك إشعار: حوّلنا ' + money(sum) + ' إلى حسابك');
+      }
+    }
+  }
+
   addNotif(d, kind, ref, title, body) {
     d.notifs = [{ id: 'n' + Date.now() + Math.random().toString(36).slice(2, 5), kind: kind, ref: ref, title: title, body: body, at: Date.now(), read: false }].concat(d.notifs);
   }
@@ -1184,7 +1223,21 @@ class Component extends DCLogic {
     var otpReady = s.otp.length === 4 && !s.loading;
     var su = s.suNameErr;
 
-    return {
+    // ---------- demo «محاكاة» buttons for outside events on this screen
+    var sims = [];
+    if (screen === 'activation' && s.accStatus === 'pending') sims.push(['قبول الطلب', function () { vals.simApprove(); }], ['رفض الطلب', function () { vals.simReject(); }]);
+    if (screen === 'tripDetail' && tdt && tdt.status === 'upcoming') {
+      if (bookedSeats(s, tdt.id) < tdt.seats) sims.push(['حجز جديد', function () { self.simEvent('newBooking'); }]);
+      if (tripBookings(s, tdt.id).some(function (b) { return b.status === 'confirmed'; })) sims.push(['الراكب ألغى', function () { self.simEvent('paxCancel'); }]);
+    }
+    if (screen === 'earnings' && d) {
+      var paidOut = function (k) { return d.trips.some(function (x) { return x.status === 'completed' && (x.payout || 'payable') === k; }); };
+      if (paidOut('pending')) sims.push(['انتهت فترة الاعتراض', function () { self.simEvent('payable'); }]);
+      if (paidOut('payable') && bankSet) sims.push(['تحويل المستحقات', function () { self.simEvent('transfer'); }]);
+    }
+
+    var vals = {
+      sims: sims.map(function (x) { return { label: 'محاكاة: ' + x[0], run: x[1] }; }), hasSims: sims.length > 0,
       c: { action: action },
       appClass: navOn ? 'with-nav' : '',
       pageBg: blue ? '#121212' : GREY[screen] ? C.bgSecondary : C.white,
@@ -1427,5 +1480,6 @@ class Component extends DCLogic {
       openPrivacyAccount: function () { self.go('static', { staticKind: 'privacy' }); },
       staticBack: function () { self.back('account'); }
     };
+    return vals;
   }
 }

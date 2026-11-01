@@ -534,6 +534,46 @@ class Component extends DCLogic {
     return this.state.bookings.filter(function (b) { return b.ref === ref; })[0] || null;
   }
 
+  // Demo helper: moves the open booking along its lifecycle and sends the push the customer would get.
+  // Trip times shift so the new step happens "now".
+  simBooking(kind) {
+    var self = this;
+    var b = this.currentBooking();
+    if (!b) return;
+    var now = nowMin();
+    var rideMin = Math.round(hoursBetween(b.trip.from, b.trip.to) * 60);
+    var retime = function (trip, dep) {
+      var day = Math.floor(dep / 1440), m = dep - day * 1440, arr = m + rideMin;
+      return Object.assign({}, trip, { dateIdx: day, depMin: m, dep: fmtTime(m), arr: fmtTime(arr) + (arr >= 1440 ? ' +1' : '') });
+    };
+    var push = {
+      enroute: ['status', 'السائق في الطريق إليك', 'كن في نقطة التجمع قبل الانطلاق.'],
+      late: ['status', 'لم يصل السائق بعد؟', 'مرّ موعد الانطلاق، يمكنك الإبلاغ عن عدم حضور السائق.'],
+      arrived: ['status', 'وصل السائق إلى نقطة التجمع', 'توجّه إلى السيارة وأبلغ السائق باسمك.'],
+      ongoing: ['status', 'بدأت رحلتك', b.trip.from + ' ← ' + b.trip.to],
+      completed: ['status', 'وصلت بالسلامة', 'شاركنا تقييمك للسائق.'],
+      refundDone: ['refund', 'تم استرداد المبلغ', 'أُعيد المبلغ إلى ' + methodName(b.method) + '.'],
+      refundFail: ['refund', 'تعذّر استرداد المبلغ', 'سنعيد المحاولة تلقائياً.']
+    }[kind];
+    this.updateBooking(b.ref, function (x) {
+      if (kind === 'late') { x.trip = retime(x.trip, now - NO_SHOW_MINUTES - 3); x.status = 'confirmed'; }
+      if (kind === 'enroute') { x.trip = retime(x.trip, now - STEP_OFFSETS.enroute); x.status = 'enroute'; }
+      if (kind === 'arrived') { x.trip = retime(x.trip, now - STEP_OFFSETS.arrived); x.status = 'arrived'; }
+      if (kind === 'ongoing') {
+        x.trip = retime(x.trip, now); x.status = 'ongoing';
+        x.passengers = x.passengers.map(function (p) { return p.status === 'active' ? Object.assign({}, p, { attendance: 'present' }) : p; });
+      }
+      if (kind === 'completed') { x.trip = retime(x.trip, now - rideMin); x.status = 'completed'; }
+      if (kind === 'refundDone' || kind === 'refundFail') {
+        x.refunds = x.refunds.map(function (r) { return r.status === 'processing' ? Object.assign({}, r, { status: kind === 'refundDone' ? 'completed' : 'failed' }) : r; });
+      }
+      return x;
+    });
+    this.setState({ notifs: [this.notif(push[0], b.ref, push[1], push[2])].concat(this.state.notifs), banner: { ref: b.ref, title: push[1], body: push[2] } });
+    clearTimeout(this.bannerTimer);
+    this.bannerTimer = setTimeout(function () { self.setState({ banner: null }); }, 5000);
+  }
+
   updateBooking(ref, fn) {
     this.setState({ bookings: this.state.bookings.map(function (b) { return b.ref === ref ? fn(Object.assign({}, b)) : b; }) });
   }
@@ -1100,7 +1140,7 @@ class Component extends DCLogic {
 
     // booking details
     var bk = this.currentBooking();
-    var d = { steps: [], passengers: [], refunds: [], ratingStars: [] };
+    var d = { steps: [], passengers: [], refunds: [], ratingStars: [], sims: [] };
     var cx = { rows: [] };
     if (bk) {
       var si = statusInfo(bk);
@@ -1120,8 +1160,19 @@ class Component extends DCLogic {
       var refundedTotal = bk.refunds.reduce(function (sum, r) { return sum + r.net; }, 0);
       var rated = !!bk.rating;
       var noPresent = bk.status === 'completed' && !bk.passengers.some(function (p) { return p.status === 'active' && p.attendance === 'present'; });
+      var sims = [];
+      if (bk.status === 'confirmed') {
+        sims.push(['تحرّك السائق', 'enroute']);
+        if (!bk.report && !canReport(bk)) sims.push(['تأخّر السائق', 'late']);
+      }
+      if (bk.status === 'enroute') sims.push(['وصل السائق', 'arrived']);
+      if (bk.status === 'arrived') sims.push(['بدأت الرحلة', 'ongoing']);
+      if (bk.status === 'ongoing') sims.push(['انتهت الرحلة', 'completed']);
+      if (bk.refunds.some(function (r) { return r.status === 'processing'; })) sims.push(['نجح الاسترداد', 'refundDone'], ['فشل الاسترداد', 'refundFail']);
       d = {
         ref: bk.ref, statusLabel: si.label, pillBg: si.bg, pillDot: si.dot,
+        hasSims: sims.length > 0, scrollPad: sims.length ? '72px' : '16px',
+        sims: sims.map(function (x) { return { label: 'محاكاة: ' + x[0], run: function () { self.simBooking(x[1]); } }; }),
         statusTitle: titles[0], statusBody: titles[1],
         showTimeline: bk.status !== 'cancelled',
         steps: STATUS_STEPS.map(function (x, i) {
