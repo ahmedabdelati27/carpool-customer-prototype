@@ -908,6 +908,14 @@ class Component extends DCLogic {
     var self = this;
     var s = this.state;
     var screen = s.screen;
+    var motion = this._motion || (this._motion = { cur: screen, stack: [], anim: "" });
+    if (motion.cur !== screen) {
+      var TAB = { home: 1, bookings: 1, account: 1 };
+      if ((TAB[screen] && TAB[motion.cur]) || motion.cur === 'launcher' || motion.cur === 'splash' || screen === 'splash') { motion.anim = 'scr-fade'; motion.stack = []; }
+      else if (motion.stack[motion.stack.length - 1] === screen) { motion.stack.pop(); motion.anim = 'scr-back'; }
+      else { motion.stack.push(motion.cur); if (motion.stack.length > 30) motion.stack.shift(); motion.anim = 'scr-fwd'; }
+      motion.cur = screen;
+    }
     var action = BRAND[this.props.brandColor] || BRAND.original;
     var phoneDisplay = displayPhone(s.phone);
     var locked = s.otpError === 'locked';
@@ -1232,7 +1240,8 @@ class Component extends DCLogic {
         cancelClosed: !canCancel(bk) && (bk.status === 'confirmed' || ACTIVE_RIDE[bk.status]) && mins <= 0,
         refundedText: money(refundedTotal)
       };
-      d.hasActions = d.canRate || d.canCancel || d.cancelClosed;
+      d.hasActions = d.canRate;
+      d.hasEndCancel = d.canCancel || d.cancelClosed;
 
       var calc = refundCalc(bk, s.cancelSel.length);
       var activeIdx = bk.passengers.map(function (p, i) { return p.status === 'active' ? i : -1; }).filter(function (i) { return i !== -1; });
@@ -1538,6 +1547,7 @@ class Component extends DCLogic {
       lang: { arOn: s.lang === 'ar', enOn: s.lang === 'en', arChecked: s.lang === 'ar' ? 'true' : 'false', enChecked: s.lang === 'en' ? 'true' : 'false' },
       showNav: navOn,
       appClass: navOn ? 'with-nav' : '',
+      navAnim: motion.anim,
       showSheet: !!s.sheet,
       isGateSheet: s.sheet === 'gate',
       isDateSheet: s.sheet === 'date',

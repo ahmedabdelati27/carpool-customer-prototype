@@ -61,6 +61,18 @@ body{margin:0}
 /* No visible scrollbars anywhere (iOS hides them); content still scrolls. */
 .app,.app *{scrollbar-width:none;-ms-overflow-style:none}
 .app::-webkit-scrollbar,.app *::-webkit-scrollbar{display:none;width:0;height:0}
+/* Navigation motion: a new screen slides 24px in with a quick fade; back comes from the other side; tabs just fade. */
+.scr-fwd{animation:scrFwd .3s cubic-bezier(.2,.8,.2,1) both}
+.scr-back{animation:scrBack .3s cubic-bezier(.2,.8,.2,1) both}
+.scr-fade{animation:scrFade .2s ease-out both}
+@keyframes scrFwd{from{transform:translateX(-24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes scrBack{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes scrFade{from{opacity:0}to{opacity:1}}
+.sheet-bg{animation:scrFade .2s ease-out both}
+.sheet-panel{animation:sheetUp .32s cubic-bezier(.2,.8,.2,1) both}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
+.drop-in{animation:dropIn .28s cubic-bezier(.2,.8,.2,1) both}
+@keyframes dropIn{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
 .spin{animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.app *{transition:none!important;animation:none!important}}
@@ -114,7 +126,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </sc-if>
 <!-- ============ PHONE (CUS-02 / CUS-03, phone-first) ============ -->
 <sc-if value="{{isPhone}}" hint-placeholder-val="{{ false }}">
-<form onSubmit="{{submitPhone}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
+<form id="scr-phone" class="{{navAnim}}" onSubmit="{{submitPhone}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
   <div style="padding: 12px 16px 0">
     
   </div>
@@ -167,7 +179,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ OTP ============ -->
 <sc-if value="{{isOtp}}" hint-placeholder-val="{{ false }}">
-<form onSubmit="{{submitOtp}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
+<form id="scr-otp" class="{{navAnim}}" onSubmit="{{submitOtp}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
   <div style="padding: 12px 16px 0">
     <button type="button" class="press fv" onClick="{{editNumber}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -240,7 +252,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </sc-if>
 
 <sc-if value="{{isSignup}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-signup" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{signupBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">إنشاء حساب سائق</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 24px">
 <div style="display: flex; flex-direction: column; gap: 6px">
@@ -262,7 +274,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isActivation}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-activation" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0">
   <svg width="32" height="32" viewBox="0 0 52 52" fill="none" role="img" aria-label="شعار التطبيق" style="display: block; flex-shrink: 0"><path d="M33.2224 15.1909C31.0846 13.7624 28.5711 13 26 13V0C31.1423 0 36.1691 1.52487 40.4448 4.38179C44.7205 7.2387 48.0529 11.2994 50.0209 16.0502C51.9887 20.801 52.5036 26.0289 51.5004 31.0723C50.4972 36.1158 48.021 40.7486 44.3847 44.3847C40.7486 48.021 36.1158 50.4972 31.0723 51.5004C26.0289 52.5036 20.801 51.9887 16.0502 50.0209C11.2994 48.0529 7.2387 44.7205 4.38179 40.4448C1.52487 36.1691 0 31.1423 0 26H13C13 28.5711 13.7624 31.0846 15.1909 33.2224C16.6193 35.3603 18.6497 37.0265 21.0252 38.0104C23.4005 38.9944 26.0144 39.2518 28.5362 38.7501C31.0579 38.2486 33.3742 37.0105 35.1924 35.1924C37.0105 33.3742 38.2486 31.0579 38.7501 28.5362C39.2518 26.0144 38.9944 23.4005 38.0104 21.0252C37.0265 18.6497 35.3603 16.6193 33.2224 15.1909Z" fill-rule="evenodd" clip-rule="evenodd" fill="#007AFF"></path><path d="M13 5.63062e-06C13 1.70719 12.6638 3.39765 12.0104 4.97488C11.3571 6.55212 10.3995 7.98522 9.19238 9.19239C7.98524 10.3996 6.55212 11.3571 4.97488 12.0104C3.39764 12.6637 1.70719 13 5.68243e-07 13L0 26C3.41437 26 6.79529 25.3275 9.94978 24.0209C13.1043 22.7142 15.9705 20.7991 18.3847 18.3847C20.7991 15.9705 22.7142 13.1043 24.0209 9.94977C25.3275 6.79529 26 3.41436 26 0L13 5.63062e-06Z" fill-rule="evenodd" clip-rule="evenodd" fill="#007AFF"></path></svg>
   <h1 style="flex: 1; margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">تفعيل حساب السائق</h1>
@@ -307,7 +319,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isDocsPersonal}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-docspersonal" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0; background: #FFFFFF">
   <sc-if value="{{wiz.showBack}}" hint-placeholder-val="{{ true }}"><button type="button" class="press fv" onClick="{{docsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button></sc-if>
   <h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700"><sc-if value="{{wiz.show}}" hint-placeholder-val="{{ true }}">تفعيل حساب السائق</sc-if><sc-if value="{{docs.isUpdate}}" hint-placeholder-val="{{ false }}">البيانات الشخصية</sc-if></h1>
@@ -386,7 +398,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isDocsVehicle}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-docsvehicle" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0; background: #FFFFFF">
   <sc-if value="{{wiz.showBack}}" hint-placeholder-val="{{ true }}"><button type="button" class="press fv" onClick="{{docsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button></sc-if>
   <h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700"><sc-if value="{{wiz.show}}" hint-placeholder-val="{{ true }}">تفعيل حساب السائق</sc-if><sc-if value="{{docs.isUpdate}}" hint-placeholder-val="{{ false }}">بيانات المركبة</sc-if></h1>
@@ -492,7 +504,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isActReview}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-actreview" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0; background: #FFFFFF">
   <sc-if value="{{wiz.showBack}}" hint-placeholder-val="{{ true }}"><button type="button" class="press fv" onClick="{{docsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button></sc-if>
   <h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700"><sc-if value="{{wiz.show}}" hint-placeholder-val="{{ true }}">تفعيل حساب السائق</sc-if><sc-if value="{{docs.isUpdate}}" hint-placeholder-val="{{ false }}"></sc-if></h1>
@@ -527,7 +539,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </sc-if>
 
 <sc-if value="{{isHome}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-home" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div data-scroll="1" data-navpad="1" style="flex: 1; min-height: 0; overflow: auto; padding: 12px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
     <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 14px; line-height: 22px; font-weight: 500; color: #5D5D5D">{{home.hello}}</span><h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">جاهز لرحلتك القادمة؟</h1></div>
@@ -566,7 +578,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isCreate}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-create" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="background: #FFFFFF; flex-shrink: 0"><div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{createBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">{{cr.title}}</h1></div><div style="display: flex; flex-direction: column; gap: 6px; padding: 0 16px 8px; flex-shrink: 0">
   <div aria-hidden="true" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
     <sc-for list="{{cr.progress.bars}}" as="pb" hint-placeholder-count="4"><span style="height: 4px; border-radius: 9999px; background: {{pb.color}}"></span></sc-for>
@@ -664,7 +676,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isPublished}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-published" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 16px">
 <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; padding-top: 48px">
     <svg width="80" height="80" viewBox="0 0 64 64" fill="none" aria-hidden="true" style="display: block"><path d="M56.1867 23.5199C55.706 23.1615 55.3309 22.68 55.1009 22.1262C54.871 21.5724 54.7946 20.9668 54.88 20.3733C56 13.3333 54.72 11.1733 53.76 10.2133C52.8 9.25328 50.6667 7.99995 43.6267 9.11995C43.0335 9.19962 42.4298 9.12067 41.8771 8.89114C41.3243 8.66161 40.8423 8.2897 40.48 7.81328C35.84 1.62662 33.4133 0.906616 32 0.906616C30.5867 0.906616 28.16 1.62662 23.52 7.81328C23.1578 8.2897 22.6757 8.66161 22.123 8.89114C21.5702 9.12067 20.9665 9.19962 20.3734 9.11995C13.3333 7.99995 11.2 9.27995 10.24 10.2133C9.28002 11.1466 8.00002 13.3333 9.12002 20.3733C9.20539 20.9668 9.12907 21.5724 8.8991 22.1262C8.66914 22.68 8.29404 23.1615 7.81335 23.5199C1.62668 28.1599 0.93335 30.5866 0.93335 32C0.93335 33.4133 1.62668 35.84 7.81335 40.4799C8.29404 40.8384 8.66914 41.3199 8.8991 41.8737C9.12907 42.4275 9.20539 43.0331 9.12002 43.6266C8.10668 50.72 9.28002 52.8266 10.24 53.7866C11.2 54.7466 13.28 55.8933 20.3734 54.88C20.9669 54.7946 21.5725 54.8709 22.1262 55.1009C22.68 55.3308 23.1615 55.7059 23.52 56.1866C28.16 62.3733 30.5867 63.0933 32 63.0933C33.4133 63.0933 35.84 62.3733 40.48 56.1866C40.8385 55.7059 41.32 55.3308 41.8738 55.1009C42.4276 54.8709 43.0331 54.7946 43.6267 54.88C50.7467 55.8933 52.8 54.72 53.76 53.7866C54.72 52.8533 55.8933 50.72 54.88 43.6266C54.7946 43.0331 54.871 42.4275 55.1009 41.8737C55.3309 41.3199 55.706 40.8384 56.1867 40.4799C62.3733 35.84 63.0667 33.4133 63.0667 32C63.0667 30.5866 62.3733 28.1599 56.1867 23.5199Z" fill="#04D268"></path><path d="M30.6667 41.3333C30.3157 41.3354 29.9678 41.2681 29.6429 41.1354C29.318 41.0027 29.0225 40.8072 28.7733 40.56L23.44 35.2267C22.9379 34.7245 22.6558 34.0435 22.6558 33.3333C22.6558 32.6232 22.9379 31.9421 23.44 31.44C23.9421 30.9379 24.6232 30.6558 25.3333 30.6558C26.0435 30.6558 26.7245 30.9379 27.2267 31.44L30.6667 34.9067L39.44 26.1067C39.6879 25.8567 39.9828 25.6583 40.3078 25.523C40.6328 25.3876 40.9813 25.3179 41.3333 25.3179C41.6854 25.3179 42.0339 25.3876 42.3589 25.523C42.6838 25.6583 42.9788 25.8567 43.2267 26.1067C43.4766 26.3546 43.675 26.6495 43.8104 26.9745C43.9458 27.2994 44.0155 27.648 44.0155 28C44.0155 28.352 43.9458 28.7006 43.8104 29.0255C43.675 29.3505 43.4766 29.6454 43.2267 29.8933L32.56 40.56C32.3108 40.8072 32.0153 41.0027 31.6904 41.1354C31.3655 41.2681 31.0176 41.3354 30.6667 41.3333Z" fill="white"></path></svg>
@@ -677,7 +689,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isTrips}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-trips" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><h1 style="flex: 1; margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">رحلاتي</h1><button type="button" class="press fv" onClick="{{openCreate}}" aria-label="إنشاء رحلة" style="width: 44px; height: 44px; padding: 0; border-radius: 9999px; border: 0; background: {{c.action}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink: 0"><path d="M6 12h12M12 18V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
 <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 0 16px 8px; flex-shrink: 0">
     <sc-for list="{{tripTabs}}" as="tt" hint-placeholder-count="4">
@@ -709,7 +721,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isTripDetail}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-tripdetail" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0; background: #FFFFFF"><button type="button" class="press fv" onClick="{{tripBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">{{td.titleText}}</h1><span dir="ltr" style="font-size: 12px; line-height: 18px; color: #5D5D5D">{{td.id}}</span></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 8px">
 <div class="sec" style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; align-items: center; gap: 12px">
@@ -771,7 +783,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </sc-if>
 
 <sc-if value="{{isBookings}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-bookings" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{bookingsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">حجوزات الركاب</h1></div>
 <div style="padding: 0 16px 8px; flex-shrink: 0"><div style="display: flex; gap: 8px; flex-wrap: wrap; flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 0 16px">
   <sc-for list="{{bkFilters}}" as="bf" hint-placeholder-count="3">
@@ -800,7 +812,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isBookingDetail}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-bookingdetail" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0; background: #FFFFFF"><button type="button" class="press fv" onClick="{{bookingDetailBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">تفاصيل الحجز</h1><span dir="ltr" style="font-size: 12px; line-height: 18px; color: #5D5D5D">{{bd.ref}}</span></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 8px">
 <div class="sec" style="background: #FFFFFF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
@@ -828,7 +840,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isRun}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-run" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0; background: #FFFFFF"><button type="button" class="press fv" onClick="{{runBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">تنفيذ الرحلة</h1><span dir="ltr" style="font-size: 12px; line-height: 18px; color: #5D5D5D">{{run.id}}</span></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 8px">
 <div class="sec" style="background: #FFFFFF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
@@ -884,7 +896,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isRunDone}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-rundone" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 8px">
 <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding-top: 40px">
     <svg width="80" height="80" viewBox="0 0 64 64" fill="none" aria-hidden="true" style="display: block"><path d="M56.1867 23.5199C55.706 23.1615 55.3309 22.68 55.1009 22.1262C54.871 21.5724 54.7946 20.9668 54.88 20.3733C56 13.3333 54.72 11.1733 53.76 10.2133C52.8 9.25328 50.6667 7.99995 43.6267 9.11995C43.0335 9.19962 42.4298 9.12067 41.8771 8.89114C41.3243 8.66161 40.8423 8.2897 40.48 7.81328C35.84 1.62662 33.4133 0.906616 32 0.906616C30.5867 0.906616 28.16 1.62662 23.52 7.81328C23.1578 8.2897 22.6757 8.66161 22.123 8.89114C21.5702 9.12067 20.9665 9.19962 20.3734 9.11995C13.3333 7.99995 11.2 9.27995 10.24 10.2133C9.28002 11.1466 8.00002 13.3333 9.12002 20.3733C9.20539 20.9668 9.12907 21.5724 8.8991 22.1262C8.66914 22.68 8.29404 23.1615 7.81335 23.5199C1.62668 28.1599 0.93335 30.5866 0.93335 32C0.93335 33.4133 1.62668 35.84 7.81335 40.4799C8.29404 40.8384 8.66914 41.3199 8.8991 41.8737C9.12907 42.4275 9.20539 43.0331 9.12002 43.6266C8.10668 50.72 9.28002 52.8266 10.24 53.7866C11.2 54.7466 13.28 55.8933 20.3734 54.88C20.9669 54.7946 21.5725 54.8709 22.1262 55.1009C22.68 55.3308 23.1615 55.7059 23.52 56.1866C28.16 62.3733 30.5867 63.0933 32 63.0933C33.4133 63.0933 35.84 62.3733 40.48 56.1866C40.8385 55.7059 41.32 55.3308 41.8738 55.1009C42.4276 54.8709 43.0331 54.7946 43.6267 54.88C50.7467 55.8933 52.8 54.72 53.76 53.7866C54.72 52.8533 55.8933 50.72 54.88 43.6266C54.7946 43.0331 54.871 42.4275 55.1009 41.8737C55.3309 41.3199 55.706 40.8384 56.1867 40.4799C62.3733 35.84 63.0667 33.4133 63.0667 32C63.0667 30.5866 62.3733 28.1599 56.1867 23.5199Z" fill="#04D268"></path><path d="M30.6667 41.3333C30.3157 41.3354 29.9678 41.2681 29.6429 41.1354C29.318 41.0027 29.0225 40.8072 28.7733 40.56L23.44 35.2267C22.9379 34.7245 22.6558 34.0435 22.6558 33.3333C22.6558 32.6232 22.9379 31.9421 23.44 31.44C23.9421 30.9379 24.6232 30.6558 25.3333 30.6558C26.0435 30.6558 26.7245 30.9379 27.2267 31.44L30.6667 34.9067L39.44 26.1067C39.6879 25.8567 39.9828 25.6583 40.3078 25.523C40.6328 25.3876 40.9813 25.3179 41.3333 25.3179C41.6854 25.3179 42.0339 25.3876 42.3589 25.523C42.6838 25.6583 42.9788 25.8567 43.2267 26.1067C43.4766 26.3546 43.675 26.6495 43.8104 26.9745C43.9458 27.2994 44.0155 27.648 44.0155 28C44.0155 28.352 43.9458 28.7006 43.8104 29.0255C43.675 29.3505 43.4766 29.6454 43.2267 29.8933L32.56 40.56C32.3108 40.8072 32.0153 41.0027 31.6904 41.1354C31.3655 41.2681 31.0176 41.3354 30.6667 41.3333Z" fill="white"></path></svg>
@@ -899,7 +911,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isChats}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-chats" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{chatsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">المحادثات</h1></div>
 <sc-if value="{{chatsHasItems}}" hint-placeholder-val="{{ true }}">
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 4px 16px 24px; display: flex; flex-direction: column; gap: 12px">
@@ -926,7 +938,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isChat}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-chat" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #FFFFFF; flex-shrink: 0">
   <button type="button" class="press fv" onClick="{{chatBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button>
   <span style="width: 40px; height: 40px; border-radius: 9999px; background: #EBF4FF; color: #0062CC; display: flex; align-items: center; justify-content: center; font-size: 15px; line-height: 22px; font-weight: 700; flex-shrink: 0">{{cv.initial}}</span>
@@ -970,7 +982,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </sc-if>
 
 <sc-if value="{{isEarnings}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-earnings" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><h1 style="flex: 1; margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">الأرباح والمستحقات</h1><div role="group" aria-label="الفترة" style="display: flex; gap: 2px; padding: 3px; border-radius: 9999px; background: #EFEFEF; flex-shrink: 0"><sc-for list="{{earnPeriods}}" as="ep" hint-placeholder-count="2"><button type="button" class="press fv" onClick="{{ep.pick}}" aria-pressed="{{ep.pressed}}" style="height: 32px; padding: 0 12px; border-radius: 9999px; border: 0; background: {{ep.bg}}; color: {{ep.color}}; box-shadow: {{ep.shadow}}; font-size: 12px; line-height: 18px; font-weight: 700">{{ep.label}}</button></sc-for></div></div>
 <div data-scroll="1" data-navpad="1" style="flex: 1; min-height: 0; overflow: auto; padding: 4px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <div class="earn-card" style="border-radius: 20px; padding: 16px 16px 16px 12px; display: flex; align-items: center; gap: 8px; color: #FFFFFF">
@@ -1010,7 +1022,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isRatings}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-ratings" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{ratingsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">التقييمات</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <div style="background: #FFFFFF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="display: flex; align-items: center; gap: 16px">
@@ -1034,7 +1046,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isNotifs}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-notifs" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{notifsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">الإشعارات</h1><sc-if value="{{hasUnreadNotifs}}" hint-placeholder-val="{{ false }}"><button type="button" class="press fv" onClick="{{readAllNotifs}}" style="height: 44px; padding: 0 4px; border: 0; background: transparent; color: {{c.action}}; font-size: 14px; line-height: 22px; font-weight: 700; border-radius: 8px; flex-shrink: 0">تحديد الكل كمقروء</button></sc-if></div>
 <sc-if value="{{notifsHasItems}}" hint-placeholder-val="{{ true }}">
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 4px 16px 24px; display: flex; flex-direction: column; gap: 12px">
@@ -1058,7 +1070,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </sc-if>
 
 <sc-if value="{{isAccount}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-account" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><h1 style="flex: 1; margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">حسابي</h1></div>
 <div data-scroll="1" data-navpad="1" style="flex: 1; min-height: 0; overflow: auto; padding: 4px 16px 24px; display: flex; flex-direction: column; gap: 16px">
 <button type="button" class="press fv" onClick="{{openProfile}}" style="width: 100%; text-align: start; background: #FFFFFF; border: 0; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 12px; color: #121212">
@@ -1078,7 +1090,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isProfile}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-profile" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{profileBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">المعلومات الشخصية</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 24px">
 <div style="display: flex; flex-direction: column; gap: 8px">
@@ -1103,7 +1115,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isChangePhone}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-changephone" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{changePhoneBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">تغيير رقم الجوال</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 20px">
 <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">سنرسل رمز تحقق إلى الرقم الجديد. يبقى رقمك الحالي فعّالاً حتى تأكيده.</p>
@@ -1117,7 +1129,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isDocsView}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-docsview" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{docsViewBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">المستندات</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <sc-if value="{{dv.docsPending}}" hint-placeholder-val="{{ false }}"><div role="status" style="background: #FFF7E6; border: 1px solid #F2D59C; border-radius: 16px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: #D99100; flex-shrink: 0"><path d="M20.75 13.25c0 4.83-3.92 8.75-8.75 8.75s-8.75-3.92-8.75-8.75S7.17 4.5 12 4.5s8.75 3.92 8.75 8.75ZM12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9 2h6" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="flex: 1; font-size: 13px; line-height: 20px; color: #121212">أرسلت تحديثاً وهو قيد مراجعة الإدارة. تبقى البيانات المعتمدة الحالية مستخدمة حتى الموافقة.</span></div></sc-if>
@@ -1136,7 +1148,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isVehicleView}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-vehicleview" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{docsViewBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">المركبة</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <sc-if value="{{dv.vehPending}}" hint-placeholder-val="{{ false }}"><div role="status" style="background: #FFF7E6; border: 1px solid #F2D59C; border-radius: 16px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: #D99100; flex-shrink: 0"><path d="M20.75 13.25c0 4.83-3.92 8.75-8.75 8.75s-8.75-3.92-8.75-8.75S7.17 4.5 12 4.5s8.75 3.92 8.75 8.75ZM12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9 2h6" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="flex: 1; font-size: 13px; line-height: 20px; color: #121212">أرسلت تحديثاً وهو قيد مراجعة الإدارة. تبقى البيانات المعتمدة الحالية مستخدمة حتى الموافقة.</span></div></sc-if>
@@ -1151,7 +1163,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isBank}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-bank" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{bankBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">البيانات البنكية</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <div role="status" style="background: #EBF4FF; border: 1px solid #B8D9FF; border-radius: 16px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: #007AFF; flex-shrink: 0"><path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10ZM12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M11.995 16h.009" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="flex: 1; font-size: 13px; line-height: 20px; color: #121212">مطلوبة قبل أول صرف لمستحقاتك فقط، ولا تؤثر على تفعيل حسابك أو نشر رحلاتك. يجب أن يكون الحساب باسمك.</span></div>
@@ -1170,7 +1182,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isSupport}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-support" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{supportBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">الدعم الفني</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <button type="button" class="press fv" onClick="{{openTicketNew}}" style="width: 100%; height: 56px; border-radius: 9999px; border: 0; background: {{c.action}}; color: #FFFFFF; font-size: 16px; line-height: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink: 0"><path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10ZM8 12h8M12 16V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>تذكرة جديدة</button>
@@ -1189,7 +1201,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isTicketNew}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-ticketnew" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{ticketNewBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">تذكرة دعم جديدة</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <div style="background: #FFFFFF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 16px"><div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; line-height: 22px; font-weight: 500">نوع المشكلة</span><div style="display: flex; gap: 8px; flex-wrap: wrap">
@@ -1222,7 +1234,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isTicket}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-ticket" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{ticketBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">{{tv.subject}}</h1><span dir="ltr" style="font-size: 12px; line-height: 18px; color: #5D5D5D">{{tv.ref}}</span></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <div style="background: #FFFFFF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 0px"><div style="min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #F0F0F0; font-size: 13px; line-height: 20px"><span style="color: #5D5D5D; flex-shrink: 0">الحالة</span><span style="font-weight: 500; text-align: left"><span style="height: 26px; padding: 0 10px; border-radius: 9999px; background: {{tv.bg}}; color: {{tv.dot}}; font-size: 12px; line-height: 18px; font-weight: 700; display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0">{{tv.status}}</span></span></div><div style="min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #F0F0F0; font-size: 13px; line-height: 20px"><span style="color: #5D5D5D; flex-shrink: 0">النوع</span><span style="font-weight: 500; text-align: left">{{tv.type}}</span></div><div style="min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #F0F0F0; font-size: 13px; line-height: 20px"><span style="color: #5D5D5D; flex-shrink: 0">مرتبطة بـ</span><span style="font-weight: 500; text-align: left">{{tv.link}}</span></div><div style="min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; line-height: 20px"><span style="color: #5D5D5D; flex-shrink: 0">تاريخ الإنشاء</span><span style="font-weight: 500; text-align: left">{{tv.date}}</span></div></div>
@@ -1237,7 +1249,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isSettings}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-settings" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{settingsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">الإعدادات</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 4px 16px 24px; display: flex; flex-direction: column; gap: 20px">
 <section style="display: flex; flex-direction: column; gap: 8px"><h2 style="margin: 0; padding: 0 4px; font-size: 14px; line-height: 22px; font-weight: 700; color: #4B4B4B">الإشعارات</h2>
@@ -1268,7 +1280,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 </div>
 </sc-if>
 <sc-if value="{{isStatic}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-static" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-shrink: 0"><button type="button" class="press fv" onClick="{{staticBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg></button><h1 style="flex: 1; margin: 0; font-size: 16px; line-height: 24px; font-weight: 700">{{st.title}}</h1></div>
 <div data-scroll="1" style="flex: 1; min-height: 0; overflow: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 16px">
 <sc-for list="{{st.sections}}" as="ss" hint-placeholder-count="3">
@@ -1307,8 +1319,8 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ SHEETS ============ -->
 <sc-if value="{{showSheet}}" hint-placeholder-val="{{ false }}">
-<div style="position: absolute; inset: 0; z-index: 20; background: rgba(18, 18, 18, 0.45); display: flex; flex-direction: column; justify-content: flex-end">
-  <div role="dialog" aria-modal="true" aria-labelledby="sheet-title" style="background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 8px 16px 20px; display: flex; flex-direction: column; gap: 16px; max-height: 660px">
+<div class="sheet-bg" style="position: absolute; inset: 0; z-index: 20; background: rgba(18, 18, 18, 0.45); display: flex; flex-direction: column; justify-content: flex-end">
+  <div role="dialog" aria-modal="true" aria-labelledby="sheet-title" class="sheet-panel" style="background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 8px 16px 20px; display: flex; flex-direction: column; gap: 16px; max-height: 660px">
     <span aria-hidden="true" style="align-self: center; width: 40px; height: 4px; border-radius: 9999px; background: #D0D0D0"></span>
 
     <sc-if value="{{isCitySheet}}" hint-placeholder-val="{{ false }}">
@@ -1374,7 +1386,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ TOAST ============ -->
 <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
-<div role="status" style="position: absolute; top: 64px; left: 16px; right: 16px; z-index: 42; background: #E6FBF0; border: 1px solid #B1F1D0; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 8px; color: #121212; font-size: 14px; line-height: 22px; font-weight: 500; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08)">
+<div role="status" class="drop-in" style="position: absolute; top: 64px; left: 16px; right: 16px; z-index: 42; background: #E6FBF0; border: 1px solid #B1F1D0; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 8px; color: #121212; font-size: 14px; line-height: 22px; font-weight: 500; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08)">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: #03A853; flex-shrink: 0"><path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="m7.75 12 2.83 2.83 5.67-5.66" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
   {{toast}}
 </div>

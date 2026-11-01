@@ -748,6 +748,14 @@ class Component extends DCLogic {
 
   renderVals() {
     var self = this, s = this.state, screen = s.screen;
+    var motion = this._motion || (this._motion = { cur: screen, stack: [], anim: '' });
+    if (motion.cur !== screen) {
+      var TABS = { home: 1, trips: 1, earnings: 1, account: 1 };
+      if ((TABS[screen] && TABS[motion.cur]) || motion.cur === 'splash' || screen === 'splash') { motion.anim = 'scr-fade'; motion.stack = []; }
+      else if (motion.stack[motion.stack.length - 1] === screen) { motion.stack.pop(); motion.anim = 'scr-back'; }
+      else { motion.stack.push(motion.cur); if (motion.stack.length > 30) motion.stack.shift(); motion.anim = 'scr-fwd'; }
+      motion.cur = screen;
+    }
     var action = BRAND[this.props.brandColor] || BRAND.original;
     var d = s.data || emptyData();
     var locked = s.otpError === 'locked';
@@ -1239,6 +1247,7 @@ class Component extends DCLogic {
       sims: sims.map(function (x) { return { label: 'محاكاة: ' + x[0], run: x[1] }; }), hasSims: sims.length > 0,
       c: { action: action },
       appClass: navOn ? 'with-nav' : '',
+      navAnim: motion.anim,
       pageBg: blue ? '#121212' : GREY[screen] ? C.bgSecondary : C.white,
       statusBg: blue ? '#121212' : GREY[screen] && !{ tripDetail: 1, create: 1, run: 1, bookingDetail: 1, docsPersonal: 1, docsVehicle: 1, actReview: 1 }[screen] ? C.bgSecondary : C.white,
       statusFg: blue ? '#FFFFFF' : '#000000',

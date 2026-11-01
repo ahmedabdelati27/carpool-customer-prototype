@@ -47,6 +47,18 @@ body{margin:0}
 /* No visible scrollbars anywhere (iOS hides them); content still scrolls. */
 .app,.app *{scrollbar-width:none;-ms-overflow-style:none}
 .app::-webkit-scrollbar,.app *::-webkit-scrollbar{display:none;width:0;height:0}
+/* Navigation motion: a new screen slides 24px in with a quick fade; back comes from the other side; tabs just fade. */
+.scr-fwd{animation:scrFwd .3s cubic-bezier(.2,.8,.2,1) both}
+.scr-back{animation:scrBack .3s cubic-bezier(.2,.8,.2,1) both}
+.scr-fade{animation:scrFade .2s ease-out both}
+@keyframes scrFwd{from{transform:translateX(-24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes scrBack{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes scrFade{from{opacity:0}to{opacity:1}}
+.sheet-bg{animation:scrFade .2s ease-out both}
+.sheet-panel{animation:sheetUp .32s cubic-bezier(.2,.8,.2,1) both}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
+.drop-in{animation:dropIn .28s cubic-bezier(.2,.8,.2,1) both}
+@keyframes dropIn{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
 .spin{animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.app *{transition:none!important;animation:none!important}}
@@ -92,7 +104,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ LAUNCHER: iOS home screen, app icon in the dock opens the app ============ -->
 <sc-if value="{{isLauncher}}" hint-placeholder-val="{{ false }}">
-<div style="position: absolute; inset: 0; z-index: 60; overflow: hidden; background: #0A2A6B">
+<div id="scr-launcher" class="{{navAnim}}" style="position: absolute; inset: 0; z-index: 60; overflow: hidden; background: #0A2A6B">
   <img src="assets/ios-home-screen.png" alt="" style="position: absolute; left: 0; top: 0; width: 375px; height: 816px; display: block">
   <button type="button" class="press fv app-icon" onClick="{{openApp}}" aria-label="فتح التطبيق" style="position: absolute; left: 34px; top: 722px; width: 60px; height: 60px; padding: 0; border: 0; border-radius: 13.4px; background: #007AFF; display: flex; align-items: center; justify-content: center">
     <svg width="36" height="36" viewBox="0 0 52 52" fill="none" aria-hidden="true"><path d="M33.2224 15.1909C31.0846 13.7624 28.5711 13 26 13V0C31.1423 0 36.1691 1.52487 40.4448 4.38179C44.7205 7.2387 48.0529 11.2994 50.0209 16.0502C51.9887 20.801 52.5036 26.0289 51.5004 31.0723C50.4972 36.1158 48.021 40.7486 44.3847 44.3847C40.7486 48.021 36.1158 50.4972 31.0723 51.5004C26.0289 52.5036 20.801 51.9887 16.0502 50.0209C11.2994 48.0529 7.2387 44.7205 4.38179 40.4448C1.52487 36.1691 0 31.1423 0 26H13C13 28.5711 13.7624 31.0846 15.1909 33.2224C16.6193 35.3603 18.6497 37.0265 21.0252 38.0104C23.4005 38.9944 26.0144 39.2518 28.5362 38.7501C31.0579 38.2486 33.3742 37.0105 35.1924 35.1924C37.0105 33.3742 38.2486 31.0579 38.7501 28.5362C39.2518 26.0144 38.9944 23.4005 38.0104 21.0252C37.0265 18.6497 35.3603 16.6193 33.2224 15.1909Z" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF"></path><path d="M13 5.63062e-06C13 1.70719 12.6638 3.39765 12.0104 4.97488C11.3571 6.55212 10.3995 7.98522 9.19238 9.19239C7.98524 10.3996 6.55212 11.3571 4.97488 12.0104C3.39764 12.6637 1.70719 13 5.68243e-07 13L0 26C3.41437 26 6.79529 25.3275 9.94978 24.0209C13.1043 22.7142 15.9705 20.7991 18.3847 18.3847C20.7991 15.9705 22.7142 13.1043 24.0209 9.94977C25.3275 6.79529 26 3.41436 26 0L13 5.63062e-06Z" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF"></path></svg>
@@ -106,14 +118,14 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ SPLASH ============ -->
 <sc-if value="{{isSplash}}" hint-placeholder-val="{{ false }}">
-<div role="status" aria-label="جارٍ فتح التطبيق" style="flex: 1; min-height: 0; background: #007AFF; display: flex; align-items: center; justify-content: center">
+<div id="scr-splash" class="{{navAnim}}" role="status" aria-label="جارٍ فتح التطبيق" style="flex: 1; min-height: 0; background: #007AFF; display: flex; align-items: center; justify-content: center">
   <svg width="40" height="40" viewBox="0 0 52 52" fill="none" aria-hidden="true"><path d="M33.2224 15.1909C31.0846 13.7624 28.5711 13 26 13V0C31.1423 0 36.1691 1.52487 40.4448 4.38179C44.7205 7.2387 48.0529 11.2994 50.0209 16.0502C51.9887 20.801 52.5036 26.0289 51.5004 31.0723C50.4972 36.1158 48.021 40.7486 44.3847 44.3847C40.7486 48.021 36.1158 50.4972 31.0723 51.5004C26.0289 52.5036 20.801 51.9887 16.0502 50.0209C11.2994 48.0529 7.2387 44.7205 4.38179 40.4448C1.52487 36.1691 0 31.1423 0 26H13C13 28.5711 13.7624 31.0846 15.1909 33.2224C16.6193 35.3603 18.6497 37.0265 21.0252 38.0104C23.4005 38.9944 26.0144 39.2518 28.5362 38.7501C31.0579 38.2486 33.3742 37.0105 35.1924 35.1924C37.0105 33.3742 38.2486 31.0579 38.7501 28.5362C39.2518 26.0144 38.9944 23.4005 38.0104 21.0252C37.0265 18.6497 35.3603 16.6193 33.2224 15.1909Z" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF"></path><path d="M13 5.63062e-06C13 1.70719 12.6638 3.39765 12.0104 4.97488C11.3571 6.55212 10.3995 7.98522 9.19238 9.19239C7.98524 10.3996 6.55212 11.3571 4.97488 12.0104C3.39764 12.6637 1.70719 13 5.68243e-07 13L0 26C3.41437 26 6.79529 25.3275 9.94978 24.0209C13.1043 22.7142 15.9705 20.7991 18.3847 18.3847C20.7991 15.9705 22.7142 13.1043 24.0209 9.94977C25.3275 6.79529 26 3.41436 26 0L13 5.63062e-06Z" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF"></path></svg>
 </div>
 </sc-if>
 
 <!-- ============ ONBOARDING (after the splash) ============ -->
 <sc-if value="{{isOnboarding}}" hint-placeholder-val="{{ false }}">
-<div style="position: absolute; inset: 0; z-index: 60; overflow: hidden; background: #007AFF">
+<div id="scr-onboarding" class="{{navAnim}}" style="position: absolute; inset: 0; z-index: 60; overflow: hidden; background: #007AFF">
   <img src="assets/onboarding-bg.png" alt="" style="position: absolute; left: 0; top: 0; width: 375px; height: 813px; display: block">
   <svg width="44" height="44" viewBox="0 0 52 52" fill="none" role="img" aria-label="شعار التطبيق" style="position: absolute; top: 76px; left: 50%; transform: translateX(-50%); display: block"><path d="M33.2224 15.1909C31.0846 13.7624 28.5711 13 26 13V0C31.1423 0 36.1691 1.52487 40.4448 4.38179C44.7205 7.2387 48.0529 11.2994 50.0209 16.0502C51.9887 20.801 52.5036 26.0289 51.5004 31.0723C50.4972 36.1158 48.021 40.7486 44.3847 44.3847C40.7486 48.021 36.1158 50.4972 31.0723 51.5004C26.0289 52.5036 20.801 51.9887 16.0502 50.0209C11.2994 48.0529 7.2387 44.7205 4.38179 40.4448C1.52487 36.1691 0 31.1423 0 26H13C13 28.5711 13.7624 31.0846 15.1909 33.2224C16.6193 35.3603 18.6497 37.0265 21.0252 38.0104C23.4005 38.9944 26.0144 39.2518 28.5362 38.7501C31.0579 38.2486 33.3742 37.0105 35.1924 35.1924C37.0105 33.3742 38.2486 31.0579 38.7501 28.5362C39.2518 26.0144 38.9944 23.4005 38.0104 21.0252C37.0265 18.6497 35.3603 16.6193 33.2224 15.1909Z" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF"></path><path d="M13 5.63062e-06C13 1.70719 12.6638 3.39765 12.0104 4.97488C11.3571 6.55212 10.3995 7.98522 9.19238 9.19239C7.98524 10.3996 6.55212 11.3571 4.97488 12.0104C3.39764 12.6637 1.70719 13 5.68243e-07 13L0 26C3.41437 26 6.79529 25.3275 9.94978 24.0209C13.1043 22.7142 15.9705 20.7991 18.3847 18.3847C20.7991 15.9705 22.7142 13.1043 24.0209 9.94977C25.3275 6.79529 26 3.41436 26 0L13 5.63062e-06Z" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF"></path></svg>
   <img class="onb-phone" src="assets/onboarding-phone.png" alt="معاينة الصفحة الرئيسية للتطبيق" style="position: absolute; top: 140px; left: 50%; width: 300px; height: 576px; display: block">
@@ -128,7 +140,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ HOME (CUS-01, CUS-04) ============ -->
 <sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
-<div data-navpad="1" style="flex: 1; min-height: 0; overflow: auto; padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 24px">
+<div id="scr-home" class="{{navAnim}}" data-navpad="1" style="flex: 1; min-height: 0; overflow: auto; padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 24px">
   <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
     <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
       <span style="font-size: 14px; line-height: 22px; font-weight: 500; color: #5D5D5D">{{hello}}</span>
@@ -286,7 +298,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ SEARCH: pick departure + arrival, then the date sheet (CUS-04) ============ -->
 <sc-if value="{{isSearch}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-search" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px">
     <button type="button" class="press fv" onClick="{{goHome}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -344,7 +356,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ RESULTS (CUS-05: sort + filter) ============ -->
 <sc-if value="{{isResults}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-results" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{backFromResults}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -450,7 +462,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ TRIP DETAILS (CUS-05) ============ -->
 <sc-if value="{{isTrip}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-trip" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{backFromTrip}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -545,18 +557,18 @@ body.phone #device{border-radius:0;box-shadow:none}
     </div>
   </div>
   <div style="background: #FFFFFF; border-top: 1px solid #E6E6E6; padding: 12px 16px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
-    <div style="display: flex; flex-direction: column">
+    <div style="display: flex; flex-direction: column; flex-shrink: 0">
       <span style="font-size: 18px; line-height: 28px; font-weight: 700; color: {{c.action}}">{{tripPriceText}}</span>
       <span style="font-size: 12px; line-height: 18px; color: #5D5D5D">للمقعد الواحد</span>
     </div>
-    <button type="button" class="press fv" onClick="{{bookNow}}" style="height: 48px; padding: 0 32px; border-radius: 9999px; border: 0; background: {{c.action}}; color: #FFFFFF; font-size: 16px; line-height: 24px; font-weight: 700">احجز الآن</button>
+    <button type="button" class="press fv" onClick="{{bookNow}}" style="min-width: 140px; height: 52px; padding: 0 40px; border-radius: 9999px; border: 0; background: {{c.action}}; color: #FFFFFF; font-size: 16px; line-height: 24px; font-weight: 700">احجز الآن</button>
   </div>
 </div>
 </sc-if>
 
 <!-- ============ PHONE (CUS-02 / CUS-03, phone-first) ============ -->
 <sc-if value="{{isPhone}}" hint-placeholder-val="{{ false }}">
-<form onSubmit="{{submitPhone}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
+<form id="scr-phone" class="{{navAnim}}" onSubmit="{{submitPhone}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
   <div style="padding: 12px 16px 0">
     <button type="button" class="press fv" onClick="{{phoneBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -611,7 +623,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ OTP ============ -->
 <sc-if value="{{isOtp}}" hint-placeholder-val="{{ false }}">
-<form onSubmit="{{submitOtp}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
+<form id="scr-otp" class="{{navAnim}}" onSubmit="{{submitOtp}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
   <div style="padding: 12px 16px 0">
     <button type="button" class="press fv" onClick="{{editNumber}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -685,7 +697,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ COMPLETE PROFILE (new number only) ============ -->
 <sc-if value="{{isProfileSetup}}" hint-placeholder-val="{{ false }}">
-<form onSubmit="{{submitProfile}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
+<form id="scr-profilesetup" class="{{navAnim}}" onSubmit="{{submitProfile}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
   <div style="flex: 1; min-height: 0; overflow: auto; padding: 68px 16px 24px; display: flex; flex-direction: column; gap: 28px">
     <div style="display: flex; flex-direction: column; gap: 8px">
       <h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">أهلاً بك! أكمل بيانات حسابك</h1>
@@ -744,7 +756,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ TERMS / PRIVACY ============ -->
 <sc-if value="{{isTerms}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-terms" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #E6E6E6">
     <button type="button" class="press fv" onClick="{{termsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -768,7 +780,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ BOOKING (CUS-06): passengers → luggage → summary ============ -->
 <sc-if value="{{isBooking}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-booking" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="background: #FFFFFF; padding: 12px 16px; display: flex; flex-direction: column; gap: 12px">
     <div style="display: flex; align-items: center; gap: 12px">
       <button type="button" class="press fv" onClick="{{bookingBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
@@ -991,12 +1003,12 @@ body.phone #device{border-radius:0;box-shadow:none}
   </div>
 
   <div style="background: #FFFFFF; border-top: 1px solid #E6E6E6; padding: 12px 16px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
-    <div style="display: flex; flex-direction: column">
+    <div style="display: flex; flex-direction: column; flex-shrink: 0">
       <span style="font-size: 12px; line-height: 18px; color: #5D5D5D">الإجمالي</span>
       <span aria-live="polite" style="font-size: 18px; line-height: 28px; font-weight: 700; color: {{c.action}}">{{totalText}}</span>
       <span style="font-size: 12px; line-height: 18px; color: #5D5D5D">{{totalSub}}</span>
     </div>
-    <button type="button" class="press fv" onClick="{{bNext}}" disabled="{{loading}}" style="height: 48px; padding: 0 24px; border-radius: 9999px; border: 0; background: {{c.action}}; color: #FFFFFF; font-size: 16px; line-height: 24px; font-weight: 700; display: flex; align-items: center; gap: 8px">
+    <button type="button" class="press fv" onClick="{{bNext}}" disabled="{{loading}}" style="min-width: 140px; height: 52px; padding: 0 40px; border-radius: 9999px; border: 0; background: {{c.action}}; color: #FFFFFF; font-size: 16px; line-height: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px">
       <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
         <svg class="spin" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.35" stroke-width="2"></circle><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
       </sc-if>
@@ -1008,7 +1020,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ PAYMENT (CUS-07) ============ -->
 <sc-if value="{{isPayment}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-payment" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{payBack}}" aria-label="رجوع لملخص الحجز" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1068,7 +1080,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ HOLD EXPIRED (BR-02) ============ -->
 <sc-if value="{{isExpired}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-expired" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center">
     <span style="width: 88px; height: 88px; border-radius: 9999px; background: #FFF7E6; color: #121212; display: flex; align-items: center; justify-content: center">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.75 13.25c0 4.83-3.92 8.75-8.75 8.75s-8.75-3.92-8.75-8.75S7.17 4.5 12 4.5s8.75 3.92 8.75 8.75ZM12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9 2h6" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -1085,7 +1097,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ CONFIRMED (CUS-07 success) ============ -->
 <sc-if value="{{isConfirmed}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-confirmed" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="flex: 1; min-height: 0; overflow: auto; padding: 40px 16px 16px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center">
     <svg width="80" height="80" viewBox="0 0 64 64" fill="none" aria-hidden="true" style="display: block"><path d="M56.1867 23.5199C55.706 23.1615 55.3309 22.68 55.1009 22.1262C54.871 21.5724 54.7946 20.9668 54.88 20.3733C56 13.3333 54.72 11.1733 53.76 10.2133C52.8 9.25328 50.6667 7.99995 43.6267 9.11995C43.0335 9.19962 42.4298 9.12067 41.8771 8.89114C41.3243 8.66161 40.8423 8.2897 40.48 7.81328C35.84 1.62662 33.4133 0.906616 32 0.906616C30.5867 0.906616 28.16 1.62662 23.52 7.81328C23.1578 8.2897 22.6757 8.66161 22.123 8.89114C21.5702 9.12067 20.9665 9.19962 20.3734 9.11995C13.3333 7.99995 11.2 9.27995 10.24 10.2133C9.28002 11.1466 8.00002 13.3333 9.12002 20.3733C9.20539 20.9668 9.12907 21.5724 8.8991 22.1262C8.66914 22.68 8.29404 23.1615 7.81335 23.5199C1.62668 28.1599 0.93335 30.5866 0.93335 32C0.93335 33.4133 1.62668 35.84 7.81335 40.4799C8.29404 40.8384 8.66914 41.3199 8.8991 41.8737C9.12907 42.4275 9.20539 43.0331 9.12002 43.6266C8.10668 50.72 9.28002 52.8266 10.24 53.7866C11.2 54.7466 13.28 55.8933 20.3734 54.88C20.9669 54.7946 21.5725 54.8709 22.1262 55.1009C22.68 55.3308 23.1615 55.7059 23.52 56.1866C28.16 62.3733 30.5867 63.0933 32 63.0933C33.4133 63.0933 35.84 62.3733 40.48 56.1866C40.8385 55.7059 41.32 55.3308 41.8738 55.1009C42.4276 54.8709 43.0331 54.7946 43.6267 54.88C50.7467 55.8933 52.8 54.72 53.76 53.7866C54.72 52.8533 55.8933 50.72 54.88 43.6266C54.7946 43.0331 54.871 42.4275 55.1009 41.8737C55.3309 41.3199 55.706 40.8384 56.1867 40.4799C62.3733 35.84 63.0667 33.4133 63.0667 32C63.0667 30.5866 62.3733 28.1599 56.1867 23.5199Z" fill="#04D268"></path><path d="M30.6667 41.3333C30.3157 41.3354 29.9678 41.2681 29.6429 41.1354C29.318 41.0027 29.0225 40.8072 28.7733 40.56L23.44 35.2267C22.9379 34.7245 22.6558 34.0435 22.6558 33.3333C22.6558 32.6232 22.9379 31.9421 23.44 31.44C23.9421 30.9379 24.6232 30.6558 25.3333 30.6558C26.0435 30.6558 26.7245 30.9379 27.2267 31.44L30.6667 34.9067L39.44 26.1067C39.6879 25.8567 39.9828 25.6583 40.3078 25.523C40.6328 25.3876 40.9813 25.3179 41.3333 25.3179C41.6854 25.3179 42.0339 25.3876 42.3589 25.523C42.6838 25.6583 42.9788 25.8567 43.2267 26.1067C43.4766 26.3546 43.675 26.6495 43.8104 26.9745C43.9458 27.2994 44.0155 27.648 44.0155 28C44.0155 28.352 43.9458 28.7006 43.8104 29.0255C43.675 29.3505 43.4766 29.6454 43.2267 29.8933L32.56 40.56C32.3108 40.8072 32.0153 41.0027 31.6904 41.1354C31.3655 41.2681 31.0176 41.3354 30.6667 41.3333Z" fill="white"></path></svg>
     <div style="display: flex; flex-direction: column; gap: 4px">
@@ -1123,7 +1135,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ MY BOOKINGS (CUS-08 tabs) ============ -->
 <sc-if value="{{isBookings}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-bookings" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="background: #FFFFFF; padding: 16px 16px 0; display: flex; flex-direction: column; gap: 12px">
     <h1 style="margin: 0; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center">حجوزاتي</h1>
     <div role="tablist" style="margin: 0 -16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid #E6E6E6">
@@ -1208,7 +1220,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ BOOKING DETAILS (CUS-08: status, no-show report, refunds, rating) ============ -->
 <sc-if value="{{isBookingDetail}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-bookingdetail" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{backToBookings}}" aria-label="رجوع لحجوزاتي" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1386,6 +1398,17 @@ body.phone #device{border-radius:0;box-shadow:none}
     <sc-if value="{{d.hasNoRateReason}}" hint-placeholder-val="{{ false }}">
       <p style="margin: 0; font-size: 12px; line-height: 18px; color: #4B4B4B; text-align: center">{{d.noRateReason}}</p>
     </sc-if>
+    <sc-if value="{{d.hasEndCancel}}" hint-placeholder-val="{{ true }}">
+      <div style="padding-top: 16px; display: flex; flex-direction: column; gap: 8px">
+    <sc-if value="{{d.canCancel}}" hint-placeholder-val="{{ true }}">
+      <span style="font-size: 12px; line-height: 18px; color: #4B4B4B; text-align: center">{{d.cancelHint}}</span>
+      <button type="button" class="press fv" onClick="{{startCancel}}" style="width: 100%; height: 56px; border-radius: 9999px; border: 1px solid #BF3B4B; background: #FFFFFF; color: #BF3B4B; font-size: 16px; line-height: 24px; font-weight: 700">إلغاء الحجز</button>
+    </sc-if>
+    <sc-if value="{{d.cancelClosed}}" hint-placeholder-val="{{ false }}">
+      <p style="margin: 0; font-size: 12px; line-height: 18px; color: #4B4B4B; text-align: center">لا يمكن إلغاء الحجز من التطبيق بعد موعد الانطلاق. للحالات الاستثنائية <button type="button" class="fv" onClick="{{openSupport}}" style="display: inline; padding: 0; border: 0; background: transparent; color: {{c.action}}; font-size: 12px; line-height: 18px; font-weight: 700; border-radius: 4px">تواصل مع الدعم</button>.</p>
+    </sc-if>
+      </div>
+    </sc-if>
   </div>
   <!-- Demo helper: moves the booking to its next state so the whole trip flow can be shown without waiting -->
   <sc-if value="{{d.hasSims}}" hint-placeholder-val="{{ true }}">
@@ -1406,13 +1429,6 @@ body.phone #device{border-radius:0;box-shadow:none}
           قيّم السائق
         </button>
       </sc-if>
-      <sc-if value="{{d.canCancel}}" hint-placeholder-val="{{ true }}">
-        <span style="font-size: 12px; line-height: 18px; color: #4B4B4B; text-align: center">{{d.cancelHint}}</span>
-        <button type="button" class="press fv" onClick="{{startCancel}}" style="width: 100%; height: 56px; border-radius: 9999px; border: 1px solid #BF3B4B; background: #FFFFFF; color: #BF3B4B; font-size: 16px; line-height: 24px; font-weight: 700">إلغاء الحجز</button>
-      </sc-if>
-      <sc-if value="{{d.cancelClosed}}" hint-placeholder-val="{{ false }}">
-        <p style="margin: 0; font-size: 12px; line-height: 18px; color: #4B4B4B; text-align: center">لا يمكن إلغاء الحجز من التطبيق بعد موعد الانطلاق. للحالات الاستثنائية <button type="button" class="fv" onClick="{{openSupport}}" style="display: inline; padding: 0; border: 0; background: transparent; color: {{c.action}}; font-size: 12px; line-height: 18px; font-weight: 700; border-radius: 4px">تواصل مع الدعم</button>.</p>
-      </sc-if>
     </div>
   </sc-if>
 </div>
@@ -1420,7 +1436,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ CANCEL BOOKING (CUS-10: BR-06 → BR-13) ============ -->
 <sc-if value="{{isCancel}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-cancel" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{backToDetail}}" aria-label="رجوع لتفاصيل الحجز" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1491,7 +1507,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ CONVERSATION (CUS-09: BR-40 → BR-43) ============ -->
 <sc-if value="{{isChat}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-chat" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{chatBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1571,7 +1587,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ NOTIFICATIONS (CUS-12) ============ -->
 <sc-if value="{{isNotifs}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-notifs" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{goHome}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1627,7 +1643,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ ACCOUNT (logged in) ============ -->
 <sc-if value="{{isAccount}}" hint-placeholder-val="{{ false }}">
-<div data-navpad="1" style="flex: 1; min-height: 0; overflow: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 20px">
+<div id="scr-account" class="{{navAnim}}" data-navpad="1" style="flex: 1; min-height: 0; overflow: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 20px">
   <h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">حسابي</h1>
   <button type="button" class="press fv" onClick="{{openProfile}}" aria-label="المعلومات الشخصية: {{displayName}}" style="width: 100%; text-align: start; background: #FFFFFF; border: 0; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 12px; color: #121212">
     <span style="width: 56px; height: 56px; border-radius: 9999px; background: #EBF4FF; color: #007AFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
@@ -1691,7 +1707,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ SETTINGS: notifications, language, delete account ============ -->
 <sc-if value="{{isSettings}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-settings" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px">
     <button type="button" class="press fv" onClick="{{settingsBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1783,7 +1799,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ PERSONAL INFO (CUS-13) ============ -->
 <sc-if value="{{isProfile}}" hint-placeholder-val="{{ false }}">
-<form onSubmit="{{saveName}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
+<form id="scr-profile" class="{{navAnim}}" onSubmit="{{saveName}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{tabAccount}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1820,7 +1836,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ CHANGE PHONE (BR-38) ============ -->
 <sc-if value="{{isChangePhone}}" hint-placeholder-val="{{ false }}">
-<form onSubmit="{{submitNewPhone}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
+<form id="scr-changephone" class="{{navAnim}}" onSubmit="{{submitNewPhone}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
   <div style="padding: 12px 16px 0">
     <button type="button" class="press fv" onClick="{{openProfile}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1860,7 +1876,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ DELETE ACCOUNT (BR-39) ============ -->
 <sc-if value="{{isDelete}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-delete" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{deleteBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1917,7 +1933,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ SUPPORT HUB (CUS-14) ============ -->
 <sc-if value="{{isSupport}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-support" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{supportBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -1957,7 +1973,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ NEW TICKET (CUS-14) ============ -->
 <sc-if value="{{isTicketNew}}" hint-placeholder-val="{{ false }}">
-<form onSubmit="{{submitTicket}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
+<form id="scr-ticketnew" class="{{navAnim}}" onSubmit="{{submitTicket}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{openSupportHub}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -2043,7 +2059,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ TICKET DETAIL (CUS-14) ============ -->
 <sc-if value="{{isTicket}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-ticket" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{openSupportHub}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -2090,7 +2106,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ FAQ (CUS-14 static page) ============ -->
 <sc-if value="{{isFaq}}" hint-placeholder-val="{{ false }}">
-<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div id="scr-faq" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
   <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF">
     <button type="button" class="press fv" onClick="{{faqBack}}" aria-label="رجوع" style="width: 44px; height: 44px; padding: 0; margin-right: -10px; border-radius: 9999px; border: 0; background: transparent; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.42504 17.225C7.26671 17.225 7.10837 17.1667 6.98337 17.0417C6.74171 16.8 6.74171 16.4 6.98337 16.1583L12.4167 10.725C12.8167 10.325 12.8167 9.67499 12.4167 9.27499L6.98337 3.84165C6.74171 3.59999 6.74171 3.19999 6.98337 2.95832C7.22504 2.71665 7.62504 2.71665 7.86671 2.95832L13.3 8.39165C13.725 8.81665 13.9667 9.39165 13.9667 9.99999C13.9667 10.6083 13.7334 11.1833 13.3 11.6083L7.86671 17.0417C7.74171 17.1583 7.58337 17.225 7.42504 17.225Z" fill="currentColor"></path></svg>
@@ -2147,8 +2163,8 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ SHEETS ============ -->
 <sc-if value="{{showSheet}}" hint-placeholder-val="{{ false }}">
-<div style="position: absolute; inset: 0; z-index: 20; background: rgba(18, 18, 18, 0.45); display: flex; flex-direction: column; justify-content: flex-end">
-  <div role="dialog" aria-modal="true" aria-labelledby="sheet-title" style="background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 8px 16px 20px; display: flex; flex-direction: column; gap: 16px; max-height: 660px">
+<div class="sheet-bg" style="position: absolute; inset: 0; z-index: 20; background: rgba(18, 18, 18, 0.45); display: flex; flex-direction: column; justify-content: flex-end">
+  <div role="dialog" aria-modal="true" aria-labelledby="sheet-title" class="sheet-panel" style="background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 8px 16px 20px; display: flex; flex-direction: column; gap: 16px; max-height: 660px">
     <span aria-hidden="true" style="align-self: center; width: 40px; height: 4px; border-radius: 9999px; background: #D0D0D0"></span>
 
     <sc-if value="{{isGateSheet}}" hint-placeholder-val="{{ true }}">
@@ -2370,7 +2386,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ IN-APP NOTIFICATION BANNER (CUS-12) ============ -->
 <sc-if value="{{hasBanner}}" hint-placeholder-val="{{ false }}">
-<div role="status" style="position: absolute; top: 56px; left: 12px; right: 12px; z-index: 41">
+<div role="status" class="drop-in" style="position: absolute; top: 56px; left: 12px; right: 12px; z-index: 41">
   <button type="button" class="press fv" onClick="{{openBanner}}" style="width: 100%; text-align: start; background: #FFFFFF; border: 1px solid #E6E6E6; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; color: #121212; box-shadow: 0 0 1px rgba(0, 0, 0, 0.2), 0 12px 32px -8px rgba(0, 0, 0, 0.2)">
     <span style="width: 40px; height: 40px; border-radius: 9999px; background: #EBF4FF; color: #0062CC; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8.5 19H8c-4 0-6-1-6-6V8c0-4 2-6 6-6h8c4 0 6 2 6 6v5c0 4-2 6-6 6h-.5c-.31 0-.61.15-.8.4l-1.5 2c-.66.88-1.74.88-2.4 0l-1.5-2c-.16-.22-.53-.4-.8-.4Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.996 11h.01M11.995 11h.01M7.995 11h.008" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -2386,7 +2402,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 
 <!-- ============ TOAST ============ -->
 <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
-<div role="status" style="position: absolute; top: 64px; left: 16px; right: 16px; z-index: 42; background: #E6FBF0; border: 1px solid #B1F1D0; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 8px; color: #121212; font-size: 14px; line-height: 22px; font-weight: 500; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08)">
+<div role="status" class="drop-in" style="position: absolute; top: 64px; left: 16px; right: 16px; z-index: 42; background: #E6FBF0; border: 1px solid #B1F1D0; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 8px; color: #121212; font-size: 14px; line-height: 22px; font-weight: 500; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08)">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: #03A853; flex-shrink: 0"><path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="m7.75 12 2.83 2.83 5.67-5.66" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
   {{toast}}
 </div>
