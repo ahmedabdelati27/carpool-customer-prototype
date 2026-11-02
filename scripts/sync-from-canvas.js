@@ -52,6 +52,12 @@ ${helmet.trim()}
 @font-face{font-family:"thmanyah sans";src:url("fonts/thmanyahsans-Medium.otf") format("opentype");font-weight:500;font-style:normal;font-display:swap}
 @font-face{font-family:"thmanyah sans";src:url("fonts/thmanyahsans-Bold.otf") format("opentype");font-weight:700;font-style:normal;font-display:swap}
 @font-face{font-family:"thmanyah sans";src:url("fonts/thmanyahsans-Black.otf") format("opentype");font-weight:900;font-style:normal;font-display:swap}
+/* thmanyah serif display for the big headings (.ttl, with "salt"). Whole woff2 files, not subset, so the OpenType features stay. */
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Light.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Medium.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Black.woff2") format("woff2");font-weight:900;font-style:normal;font-display:swap}
 html,body{height:100%}
 body{margin:0;background:#E9EDF3;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #stage{position:relative;width:375px;height:812px;flex-shrink:0;transform-origin:center center}

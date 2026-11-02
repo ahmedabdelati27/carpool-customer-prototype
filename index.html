@@ -11,6 +11,8 @@
 body{margin:0}
 .app *{box-sizing:border-box}
 .app,.app button,.app input{font-family:"thmanyah sans","IBM Plex Sans Arabic",system-ui,sans-serif}
+/* Big headings: thmanyah serif display with its stylistic alternates (salt). Small text keeps the sans without salt. No letter-spacing: it breaks the Arabic joins. */
+.app .ttl{font-family:"thmanyah serif display","thmanyah sans","IBM Plex Sans Arabic",system-ui,serif;font-feature-settings:"salt" 1;letter-spacing:0}
 .app button{cursor:pointer;transition:transform .12s ease,background-color .12s ease}
 .app button:disabled{cursor:not-allowed}
 .app input::placeholder{color:#8A8A8A}
@@ -71,6 +73,12 @@ a{color:#0062CC}a:hover{color:#0051A8}
 @font-face{font-family:"thmanyah sans";src:url("fonts/thmanyahsans-Medium.otf") format("opentype");font-weight:500;font-style:normal;font-display:swap}
 @font-face{font-family:"thmanyah sans";src:url("fonts/thmanyahsans-Bold.otf") format("opentype");font-weight:700;font-style:normal;font-display:swap}
 @font-face{font-family:"thmanyah sans";src:url("fonts/thmanyahsans-Black.otf") format("opentype");font-weight:900;font-style:normal;font-display:swap}
+/* thmanyah serif display for the big headings (.ttl, with "salt"). Whole woff2 files, not subset, so the OpenType features stay. */
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Light.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Medium.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("fonts/thmanyahserifdisplay-Black.woff2") format("woff2");font-weight:900;font-style:normal;font-display:swap}
 html,body{height:100%}
 body{margin:0;background:#E9EDF3;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #stage{position:relative;width:375px;height:812px;flex-shrink:0;transform-origin:center center}
@@ -130,7 +138,7 @@ body.phone #device{border-radius:0;box-shadow:none}
   <svg width="44" height="44" viewBox="0 0 52 52" fill="none" role="img" aria-label="شعار التطبيق" style="position: absolute; top: 76px; left: 50%; transform: translateX(-50%); display: block"><path d="M33.2224 15.1909C31.0846 13.7624 28.5711 13 26 13V0C31.1423 0 36.1691 1.52487 40.4448 4.38179C44.7205 7.2387 48.0529 11.2994 50.0209 16.0502C51.9887 20.801 52.5036 26.0289 51.5004 31.0723C50.4972 36.1158 48.021 40.7486 44.3847 44.3847C40.7486 48.021 36.1158 50.4972 31.0723 51.5004C26.0289 52.5036 20.801 51.9887 16.0502 50.0209C11.2994 48.0529 7.2387 44.7205 4.38179 40.4448C1.52487 36.1691 0 31.1423 0 26H13C13 28.5711 13.7624 31.0846 15.1909 33.2224C16.6193 35.3603 18.6497 37.0265 21.0252 38.0104C23.4005 38.9944 26.0144 39.2518 28.5362 38.7501C31.0579 38.2486 33.3742 37.0105 35.1924 35.1924C37.0105 33.3742 38.2486 31.0579 38.7501 28.5362C39.2518 26.0144 38.9944 23.4005 38.0104 21.0252C37.0265 18.6497 35.3603 16.6193 33.2224 15.1909Z" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF"></path><path d="M13 5.63062e-06C13 1.70719 12.6638 3.39765 12.0104 4.97488C11.3571 6.55212 10.3995 7.98522 9.19238 9.19239C7.98524 10.3996 6.55212 11.3571 4.97488 12.0104C3.39764 12.6637 1.70719 13 5.68243e-07 13L0 26C3.41437 26 6.79529 25.3275 9.94978 24.0209C13.1043 22.7142 15.9705 20.7991 18.3847 18.3847C20.7991 15.9705 22.7142 13.1043 24.0209 9.94977C25.3275 6.79529 26 3.41436 26 0L13 5.63062e-06Z" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF"></path></svg>
   <img class="onb-phone" src="assets/onboarding-phone.png" alt="معاينة الصفحة الرئيسية للتطبيق" style="position: absolute; top: 140px; left: 50%; width: 300px; height: 576px; display: block">
   <div style="position: absolute; left: 0; right: 0; bottom: 0; background: #FFFFFF; border-radius: 32px 32px 0 0; padding: 28px 16px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; box-shadow: 0 -12px 32px rgba(18, 18, 18, 0.12)">
-    <h1 style="margin: 0; font-size: 26px; line-height: 38px; font-weight: 700; color: #121212">رحلتك بين المدن<br>أسهل وأوفر</h1>
+    <h1 class="ttl" style="margin: 0; font-size: 26px; line-height: 38px; font-weight: 700; color: #121212">رحلتك بين المدن<br>أسهل وأوفر</h1>
     <p style="margin: 0; max-width: 300px; font-size: 15px; line-height: 24px; color: #5D5D5D">احجز مقعدك مع سائقين موثوقين، وتابع رحلتك خطوة بخطوة</p>
     <button type="button" class="press fv" onClick="{{onbStart}}" style="width: 100%; height: 56px; margin-top: 16px; border-radius: 9999px; border: 0; background: {{c.action}}; color: #FFFFFF; font-size: 16px; line-height: 24px; font-weight: 700">ابدأ الآن</button>
     <button type="button" class="press fv" onClick="{{onbGuest}}" style="width: 100%; height: 48px; border-radius: 9999px; border: 0; background: transparent; color: {{c.action}}; font-size: 15px; line-height: 24px; font-weight: 700">تصفح كزائر</button>
@@ -144,7 +152,7 @@ body.phone #device{border-radius:0;box-shadow:none}
   <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
     <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
       <span style="font-size: 14px; line-height: 22px; font-weight: 500; color: #5D5D5D">{{hello}}</span>
-      <h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700; color: #121212">إلى أين وجهتك؟</h1>
+      <h1 class="ttl" style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700; color: #121212">إلى أين وجهتك؟</h1>
     </div>
     <sc-if value="{{isGuest}}" hint-placeholder-val="{{ true }}">
       <button type="button" class="press fv" onClick="{{headerLogin}}" style="height: 44px; padding: 0 16px; border-radius: 9999px; border: 1px solid {{c.action}}; background: #FFFFFF; color: {{c.action}}; font-size: 14px; line-height: 22px; font-weight: 700; display: flex; align-items: center; gap: 6px; flex-shrink: 0">
@@ -436,7 +444,7 @@ body.phone #device{border-radius:0;box-shadow:none}
       <span style="width: 88px; height: 88px; border-radius: 9999px; background: #EBF4FF; color: #007AFF; display: flex; align-items: center; justify-content: center">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 6.5h-6M6 6.5H2M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM22 17.5h-4M8 17.5H2M14 21a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path></svg>
       </span>
-      <h2 style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">لا توجد رحلات تطابق التصفية</h2>
+      <h2 class="ttl" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">لا توجد رحلات تطابق التصفية</h2>
       <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B; max-width: 290px">{{filteredEmptyBody}}</p>
       <button type="button" class="press fv" onClick="{{clearFilterNow}}" style="height: 48px; padding: 0 28px; border-radius: 9999px; border: 1px solid {{c.action}}; background: #FFFFFF; color: {{c.action}}; font-size: 16px; line-height: 24px; font-weight: 700">مسح التصفية</button>
     </div>
@@ -448,7 +456,7 @@ body.phone #device{border-radius:0;box-shadow:none}
         <span style="width: 88px; height: 88px; border-radius: 9999px; background: #EBF4FF; color: #007AFF; display: flex; align-items: center; justify-content: center">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 5h6M14 8h3M21 11.5c0 5.25-4.25 9.5-9.5 9.5S2 16.75 2 11.5 6.25 2 11.5 2M22 22l-2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         </span>
-        <h2 style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">لا توجد رحلات متاحة</h2>
+        <h2 class="ttl" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">لا توجد رحلات متاحة</h2>
         <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B; max-width: 290px">{{noResultsBody}}</p>
       </div>
       <div style="padding: 16px; display: flex; flex-direction: column; gap: 8px">
@@ -578,7 +586,7 @@ body.phone #device{border-radius:0;box-shadow:none}
     <div style="display: flex; flex-direction: column; gap: 24px">
       <svg width="40" height="40" viewBox="0 0 52 52" fill="none" role="img" aria-label="شعار التطبيق" style="display: block; flex-shrink: 0"><path d="M33.2224 15.1909C31.0846 13.7624 28.5711 13 26 13V0C31.1423 0 36.1691 1.52487 40.4448 4.38179C44.7205 7.2387 48.0529 11.2994 50.0209 16.0502C51.9887 20.801 52.5036 26.0289 51.5004 31.0723C50.4972 36.1158 48.021 40.7486 44.3847 44.3847C40.7486 48.021 36.1158 50.4972 31.0723 51.5004C26.0289 52.5036 20.801 51.9887 16.0502 50.0209C11.2994 48.0529 7.2387 44.7205 4.38179 40.4448C1.52487 36.1691 0 31.1423 0 26H13C13 28.5711 13.7624 31.0846 15.1909 33.2224C16.6193 35.3603 18.6497 37.0265 21.0252 38.0104C23.4005 38.9944 26.0144 39.2518 28.5362 38.7501C31.0579 38.2486 33.3742 37.0105 35.1924 35.1924C37.0105 33.3742 38.2486 31.0579 38.7501 28.5362C39.2518 26.0144 38.9944 23.4005 38.0104 21.0252C37.0265 18.6497 35.3603 16.6193 33.2224 15.1909Z" fill-rule="evenodd" clip-rule="evenodd" fill="#007AFF"></path><path d="M13 5.63062e-06C13 1.70719 12.6638 3.39765 12.0104 4.97488C11.3571 6.55212 10.3995 7.98522 9.19238 9.19239C7.98524 10.3996 6.55212 11.3571 4.97488 12.0104C3.39764 12.6637 1.70719 13 5.68243e-07 13L0 26C3.41437 26 6.79529 25.3275 9.94978 24.0209C13.1043 22.7142 15.9705 20.7991 18.3847 18.3847C20.7991 15.9705 22.7142 13.1043 24.0209 9.94977C25.3275 6.79529 26 3.41436 26 0L13 5.63062e-06Z" fill-rule="evenodd" clip-rule="evenodd" fill="#007AFF"></path></svg>
       <div style="display: flex; flex-direction: column; gap: 8px">
-        <h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">أدخل رقم جوالك</h1>
+        <h1 class="ttl" style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">أدخل رقم جوالك</h1>
         <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">سنرسل لك رمز تحقق لتسجيل الدخول، أو لإنشاء حساب جديد إذا كانت هذه أول مرة لك.</p>
       </div>
     </div>
@@ -631,7 +639,7 @@ body.phone #device{border-radius:0;box-shadow:none}
   </div>
   <div style="flex: 1; min-height: 0; overflow: auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 32px">
     <div style="display: flex; flex-direction: column; gap: 8px">
-      <h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">{{otpTitle}}</h1>
+      <h1 class="ttl" style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">{{otpTitle}}</h1>
       <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">أرسلنا رمزاً من 4 أرقام إلى</p>
       <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
         <span dir="ltr" style="font-size: 16px; line-height: 24px; font-weight: 700">{{otpPhoneDisplay}}</span>
@@ -700,7 +708,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 <form id="scr-profilesetup" class="{{navAnim}}" onSubmit="{{submitProfile}}" novalidate="novalidate" style="flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0">
   <div style="flex: 1; min-height: 0; overflow: auto; padding: 68px 16px 24px; display: flex; flex-direction: column; gap: 28px">
     <div style="display: flex; flex-direction: column; gap: 8px">
-      <h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">أهلاً بك! أكمل بيانات حسابك</h1>
+      <h1 class="ttl" style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">أهلاً بك! أكمل بيانات حسابك</h1>
       <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">هذه أول مرة تستخدم فيها هذا الرقم. أدخل اسمك لإنشاء حسابك.</p>
     </div>
     <div style="background: #E6FBF0; border: 1px solid #B1F1D0; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px">
@@ -1634,7 +1642,7 @@ body.phone #device{border-radius:0;box-shadow:none}
       <span style="width: 88px; height: 88px; border-radius: 9999px; background: #EBF4FF; color: #007AFF; display: flex; align-items: center; justify-content: center">
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 6.44v3.33M12.02 2C8.34 2 5.36 4.98 5.36 8.66v2.1c0 .68-.28 1.7-.63 2.28l-1.27 2.12c-.78 1.31-.24 2.77 1.2 3.25a23.34 23.34 0 0 0 14.73 0 2.22 2.22 0 0 0 1.2-3.25l-1.27-2.12c-.35-.58-.63-1.61-.63-2.28v-2.1C18.68 5 15.68 2 12.02 2Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"></path><path d="M15.33 18.82c0 1.83-1.5 3.33-3.33 3.33-.91 0-1.75-.38-2.35-.98-.6-.6-.98-1.44-.98-2.35" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></path></svg>
       </span>
-      <h2 style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">لا توجد إشعارات</h2>
+      <h2 class="ttl" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">لا توجد إشعارات</h2>
       <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B; max-width: 280px">ستصلك هنا تحديثات حجوزاتك، وتذكيرات قبل رحلاتك، ورسائل السائق.</p>
     </div>
   </sc-if>
@@ -1644,7 +1652,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 <!-- ============ ACCOUNT (logged in) ============ -->
 <sc-if value="{{isAccount}}" hint-placeholder-val="{{ false }}">
 <div id="scr-account" class="{{navAnim}}" data-navpad="1" style="flex: 1; min-height: 0; overflow: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 20px">
-  <h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">حسابي</h1>
+  <h1 class="ttl" style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">حسابي</h1>
   <button type="button" class="press fv" onClick="{{openProfile}}" aria-label="المعلومات الشخصية: {{displayName}}" style="width: 100%; text-align: start; background: #FFFFFF; border: 0; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 12px; color: #121212">
     <span style="width: 56px; height: 56px; border-radius: 9999px; background: #EBF4FF; color: #007AFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM20.59 22c0-3.87-3.85-7-8.59-7s-8.59 3.13-8.59 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -1844,7 +1852,7 @@ body.phone #device{border-radius:0;box-shadow:none}
   </div>
   <div style="flex: 1; min-height: 0; overflow: auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 28px">
     <div style="display: flex; flex-direction: column; gap: 8px">
-      <h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">تغيير رقم الجوال</h1>
+      <h1 class="ttl" style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">تغيير رقم الجوال</h1>
       <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">رقمك الحالي <span dir="ltr" style="font-weight: 700; color: #121212">{{phoneDisplay}}</span>. سنرسل رمز تحقق إلى الرقم الجديد، ولن يتغير رقمك قبل تأكيده.</p>
     </div>
     <div style="display: flex; flex-direction: column; gap: 10px">
@@ -1889,7 +1897,7 @@ body.phone #device{border-radius:0;box-shadow:none}
       <span style="width: 72px; height: 72px; border-radius: 9999px; background: #FFEDF0; color: #BF3B4B; display: flex; align-items: center; justify-content: center">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 5.98c-3.33-.33-6.68-.5-10.02-.5-1.98 0-3.96.1-5.94.3L3 5.98M8.5 4.97l.22-1.31C8.88 2.71 9 2 10.69 2h2.62c1.69 0 1.82.75 1.97 1.67l.22 1.3M18.85 9.14l-.65 10.07C18.09 20.78 18 22 15.21 22H8.79C6 22 5.91 20.78 5.8 19.21L5.15 9.14M10.33 16.5h3.33M9.5 12.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
       </span>
-      <h2 style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">حذف حسابك نهائياً</h2>
+      <h2 class="ttl" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">حذف حسابك نهائياً</h2>
     </div>
     <div class="sec" style="background: #FFFFFF; border: 1px solid #E6E6E6; border-radius: 12px; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; line-height: 18px; color: #4B4B4B">
       <span style="font-size: 14px; line-height: 22px; font-weight: 700; color: #121212">ماذا يحدث عند الحذف؟</span>
@@ -2173,7 +2181,7 @@ body.phone #device{border-radius:0;box-shadow:none}
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM20.59 22c0-3.87-3.85-7-8.59-7s-8.59 3.13-8.59 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         </span>
         <div style="display: flex; flex-direction: column; gap: 4px">
-          <h2 id="sheet-title" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">{{gateTitle}}</h2>
+          <h2 class="ttl" id="sheet-title" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">{{gateTitle}}</h2>
           <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">نحتاج رقم جوالك فقط، بدون كلمة مرور.</p>
         </div>
         <div style="width: 100%; display: flex; flex-direction: column; gap: 8px">
@@ -2346,7 +2354,7 @@ body.phone #device{border-radius:0;box-shadow:none}
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 5.98c-3.33-.33-6.68-.5-10.02-.5-1.98 0-3.96.1-5.94.3L3 5.98M8.5 4.97l.22-1.31C8.88 2.71 9 2 10.69 2h2.62c1.69 0 1.82.75 1.97 1.67l.22 1.3M18.85 9.14l-.65 10.07C18.09 20.78 18 22 15.21 22H8.79C6 22 5.91 20.78 5.8 19.21L5.15 9.14M10.33 16.5h3.33M9.5 12.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         </span>
         <div style="display: flex; flex-direction: column; gap: 4px">
-          <h2 id="sheet-title" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">حذف حسابك؟</h2>
+          <h2 class="ttl" id="sheet-title" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">حذف حسابك؟</h2>
           <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">سيُرسل طلب الحذف ويُسجَّل خروجك فوراً. يكتمل الحذف خلال 14 يوماً وتصلك رسالة نصية بذلك.</p>
         </div>
         <div style="width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
@@ -2362,7 +2370,7 @@ body.phone #device{border-radius:0;box-shadow:none}
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17.44 14.62 20 12.06 17.44 9.5M9.76 12.06h10.17M11.76 20c-4.42 0-8-3-8-8s3.58-8 8-8" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         </span>
         <div style="display: flex; flex-direction: column; gap: 4px">
-          <h2 id="sheet-title" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">تسجيل الخروج؟</h2>
+          <h2 class="ttl" id="sheet-title" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">تسجيل الخروج؟</h2>
           <p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">ستحتاج إلى رقم جوالك ورمز التحقق لتسجيل الدخول مرة أخرى.</p>
         </div>
         <div style="width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">

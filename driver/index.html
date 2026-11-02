@@ -30,6 +30,8 @@
 body{margin:0}
 .app *{box-sizing:border-box}
 .app,.app button,.app input{font-family:"thmanyah sans","IBM Plex Sans Arabic",system-ui,sans-serif}
+/* Big headings: thmanyah serif display with its stylistic alternates (salt). Small text keeps the sans without salt. No letter-spacing: it breaks the Arabic joins. */
+.app .ttl{font-family:"thmanyah serif display","thmanyah sans","IBM Plex Sans Arabic",system-ui,serif;font-feature-settings:"salt" 1;letter-spacing:0}
 .app button{cursor:pointer;transition:transform .12s ease,background-color .12s ease}
 .app button:disabled{cursor:not-allowed}
 .app input::placeholder{color:#8A8A8A}
@@ -85,6 +87,12 @@ a{color:#0062CC}a:hover{color:#0051A8}
 @font-face{font-family:"thmanyah sans";src:url("../fonts/thmanyahsans-Medium.otf") format("opentype");font-weight:500;font-style:normal;font-display:swap}
 @font-face{font-family:"thmanyah sans";src:url("../fonts/thmanyahsans-Bold.otf") format("opentype");font-weight:700;font-style:normal;font-display:swap}
 @font-face{font-family:"thmanyah sans";src:url("../fonts/thmanyahsans-Black.otf") format("opentype");font-weight:900;font-style:normal;font-display:swap}
+/* thmanyah serif display for the big headings (.ttl, with "salt"). Whole woff2 files, not subset, so the OpenType features stay. */
+@font-face{font-family:"thmanyah serif display";src:url("../fonts/thmanyahserifdisplay-Light.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("../fonts/thmanyahserifdisplay-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("../fonts/thmanyahserifdisplay-Medium.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("../fonts/thmanyahserifdisplay-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"thmanyah serif display";src:url("../fonts/thmanyahserifdisplay-Black.woff2") format("woff2");font-weight:900;font-style:normal;font-display:swap}
 html,body{height:100%}
 body{margin:0;background:#E9EDF3;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #stage{position:relative;width:375px;height:812px;flex-shrink:0;transform-origin:center center}
@@ -542,7 +550,7 @@ body.phone #device{border-radius:0;box-shadow:none}
 <div id="scr-home" class="{{navAnim}}" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
 <div data-scroll="1" data-navpad="1" style="flex: 1; min-height: 0; overflow: auto; padding: 12px 16px 24px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
-    <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 14px; line-height: 22px; font-weight: 500; color: #5D5D5D">{{home.hello}}</span><h1 style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">جاهز لرحلتك القادمة؟</h1></div>
+    <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 14px; line-height: 22px; font-weight: 500; color: #5D5D5D">{{home.hello}}</span><h1 class="ttl" style="margin: 0; font-size: 20px; line-height: 30px; font-weight: 700">جاهز لرحلتك القادمة؟</h1></div>
     <div style="display: flex; gap: 8px"><button type="button" class="press fv" onClick="{{tabEarnings}}" aria-label="{{home.walletAria}}" style="height: 44px; padding: 0 14px 0 8px; border-radius: 9999px; border: 0; background: #FFFFFF; color: #121212; display: flex; align-items: center; gap: 6px; flex-shrink: 0"><img src="assets/coins.svg" alt="" width="30" height="23" style="display: block"><span style="font-size: 14px; line-height: 20px; font-weight: 700">{{home.wallet}}</span></button><button type="button" class="press fv" onClick="{{openNotifs}}" aria-label="{{home.bellAria}}" style="position: relative; width: 44px; height: 44px; padding: 0; border-radius: 9999px; border: 0; background: #FFFFFF; color: #121212; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
       <sc-if value="{{hasUnreadNotifs}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; top: -4px; inset-inline-end: -4px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 9999px; background: #BF3B4B; color: #FFFFFF; border: 2px solid #FAFAFA; font-size: 12px; line-height: 16px; font-weight: 700; text-align: center">{{unreadNotifs}}</span></sc-if>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink: 0"><path d="M12.02 2.91c-3.31 0-6 2.69-6 6v2.89c0 .61-.26 1.54-.57 2.06L4.3 15.77c-.71 1.18-.22 2.49 1.08 2.93 4.31 1.44 8.96 1.44 13.27 0 1.21-.4 1.74-1.83 1.08-2.93l-1.15-1.91c-.3-.52-.56-1.45-.56-2.06V8.91c0-3.3-2.7-6-6-6Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"></path><path d="M13.87 3.2a6.754 6.754 0 0 0-3.7 0c.29-.74 1.01-1.26 1.85-1.26.84 0 1.56.52 1.85 1.26Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.02 19.06c0 1.65-1.35 3-3 3-.82 0-1.58-.34-2.12-.88a3.01 3.01 0 0 1-.88-2.12" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></path></svg>
