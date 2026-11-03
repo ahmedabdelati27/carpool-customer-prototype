@@ -39,6 +39,13 @@ const page = `<!doctype html>
 <meta name="theme-color" content="#121212">
 <title>تطبيق السائق · نموذج تفاعلي</title>
 <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml">
+<!-- Add to Home Screen: opens full screen with its own icon -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/pwa/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="السائق">
 ${withAssets(helmet.trim())}
 <style>
 /* thmanyah sans, the design font (files in /fonts). IBM Plex Sans Arabic stays as the fallback. */
@@ -59,6 +66,11 @@ body{margin:0;background:#E9EDF3;display:flex;align-items:center;justify-content
 #device{width:375px;height:812px;overflow:hidden;border-radius:44px;background:#FFFFFF;box-shadow:0 30px 80px rgba(18,18,18,0.18),0 0 0 10px #121212}
 body.phone{background:#FFFFFF}
 body.phone #device{border-radius:0;box-shadow:none}
+/* Opened from the home screen: fill the screen, and hide the drawn status bar (the phone shows its real one). */
+body.standalone{background:#FFFFFF}
+body.standalone #device{border-radius:0;box-shadow:none}
+body.standalone #device > .app{height:100%!important}
+body.standalone #device div:has(> svg[viewBox="9 0 375 60"]){display:none}
 </style>
 </head>
 <body>
@@ -77,7 +89,17 @@ ${withAssets(template)}
   var preset = PRESETS.indexOf(q.get('preset')) !== -1 ? q.get('preset') : 'live';
   var brand = q.get('brand') === 'accessible' ? 'accessible' : 'original';
   var stage = document.getElementById('stage');
+  var device = document.getElementById('device');
+  var standalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  document.body.classList.toggle('standalone', standalone);
   function fit() {
+    if (standalone) {
+      // full width; the height follows the screen instead of the fixed 812
+      var s = window.innerWidth / 375, h = Math.round(window.innerHeight / s) + 'px';
+      stage.style.height = h; device.style.height = h;
+      stage.style.transform = 'scale(' + s + ')';
+      return;
+    }
     var phone = window.innerWidth < 500;
     document.body.classList.toggle('phone', phone);
     var scale = phone
@@ -87,6 +109,7 @@ ${withAssets(template)}
   }
   window.addEventListener('resize', fit);
   fit();
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('../sw.js', { scope: '../' }).catch(function () {});
   DCLite.mount(document.getElementById('device'), document.getElementById('app-template').content, Component, { preset: preset, brandColor: brand });
 })();
 </script>

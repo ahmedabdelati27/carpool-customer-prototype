@@ -1,0 +1,18 @@
+{
+  "id": "/?app=customer",
+  "name": "تطبيق العميل · التوصيل بين المدن",
+  "short_name": "العميل",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./?preset=splash&app=1",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#007AFF",
+  "theme_color": "#007AFF",
+  "icons": [
+    { "src": "assets/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/pwa/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

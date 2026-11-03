@@ -45,6 +45,15 @@ Each app lists its presets in its `index.html` (`PRESETS`). Add `&brand=accessib
 
 All names, cars, plates, prices and times are sample data.
 
+### Install on a phone
+
+Each app can be added to the home screen as its own icon. It then opens full screen, without the browser bars.
+
+- **iPhone (Safari):** open the site (customer) or `driver/` (driver), tap Share, then «إضافة إلى الشاشة الرئيسية».
+- **Android (Chrome):** open the same link and choose «تثبيت التطبيق» from the menu.
+
+From the icon, the customer app starts on its splash screen (not the iPhone home screen) and the driver app on its own splash. The phone shows its real status bar, so the drawn one is hidden. `sw.js` fetches from the network first and keeps a copy for when there is no connection, so a new deploy shows up on the next launch.
+
 ## Run locally
 
 It is a static site with no build step:
