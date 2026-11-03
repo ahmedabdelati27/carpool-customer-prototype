@@ -410,7 +410,6 @@ class Component extends DCLogic {
   flash(patch, msg) {
     var self = this;
     this.setState(Object.assign({}, patch, { toast: msg }));
-    if (this.frozen) return;
     clearTimeout(this.toastTimer);
     this.toastTimer = setTimeout(function () { self.setState({ toast: '' }); }, 2800);
   }
@@ -510,7 +509,7 @@ class Component extends DCLogic {
     var k = this.state.kind;
     if (k === 'new') { this.setState({ screen: 'signup', suName: '', suNameErr: '', suAgree: false, suAgreeErr: false, prev: {} }); return; }
     if (k === 'approved') {
-      this.flash({ screen: 'home', prev: {}, accStatus: 'approved', driverName: 'فهد العتيبي', data: sampleData(), docs: approvedDocs(), veh: approvedVehicle(), personalDone: true, vehicleDone: true, fresh: false }, 'أهلاً فهد، تم تسجيل الدخول');
+      this.setState({ screen: 'home', prev: {}, accStatus: 'approved', driverName: 'فهد العتيبي', data: sampleData(), docs: approvedDocs(), veh: approvedVehicle(), personalDone: true, vehicleDone: true, fresh: false });
       return;
     }
     var patch = { screen: 'activation', prev: {}, accStatus: k, driverName: 'محمد الشهري', data: emptyData(), fresh: true, docs: approvedDocs(), veh: approvedVehicle(), personalDone: true, vehicleDone: k !== 'rejected' };
@@ -527,8 +526,8 @@ class Component extends DCLogic {
     if (nameErr || agreeErr) return;
     this.setState({ loading: true });
     this.later(800, function () {
-      self.flash({ loading: false, screen: 'docsPersonal', docsMode: 'activation', prev: {}, driverName: name, accStatus: 'draft', data: emptyData(), fresh: true,
-        docs: blankDocs(), veh: blankVehicle(), docsDraft: blankDocs(), docsErr: {}, personalDone: false, vehicleDone: false }, 'تم إنشاء حسابك. أكمل الخطوات لتفعيله');
+      self.setState({ loading: false, screen: 'docsPersonal', docsMode: 'activation', prev: {}, driverName: name, accStatus: 'draft', data: emptyData(), fresh: true,
+        docs: blankDocs(), veh: blankVehicle(), docsDraft: blankDocs(), docsErr: {}, personalDone: false, vehicleDone: false });
     });
   }
 

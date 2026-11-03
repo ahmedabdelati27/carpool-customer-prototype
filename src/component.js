@@ -382,7 +382,7 @@ var PRESETS = {
   'otp-expired': { screen: 'otp', origin: 'trip', phone: '501234567', otpError: 'expired', seconds: 0 },
   'otp-locked': { screen: 'otp', origin: 'trip', phone: '501234567', otpError: 'locked', attempts: 5, seconds: 0 },
   'profile-errors': { screen: 'profileSetup', origin: 'trip', phone: '551234567', isNew: true, nameError: 'short', name: 'سارة', agreeError: true },
-  'booking': Object.assign({}, USER, { screen: 'booking', origin: 'trip', toast: 'تم تسجيل الدخول بنجاح' }),
+  'booking': Object.assign({}, USER, { screen: 'booking', origin: 'trip' }),
   'results-filter': { screen: 'results', from: 'الرياض', to: 'جدة', dateIdx: 1, sortBy: 'price', sheet: 'filter', fTimes: ['morning', 'noon'], fMax: 0 },
   'trip-details': Object.assign({}, USER, { screen: 'trip', tripBack: 'results' }),
   'book-passengers': Object.assign({}, BOOK, { bStep: 1 }),
@@ -758,7 +758,6 @@ class Component extends DCLogic {
   flash(patch, msg) {
     var self = this;
     this.setState(Object.assign({}, patch, { toast: msg }));
-    if (this.frozen) return;
     clearTimeout(this.toastTimer);
     this.toastTimer = setTimeout(function () { self.setState({ toast: '' }); }, 2800);
   }
@@ -864,7 +863,7 @@ class Component extends DCLogic {
           return;
         }
         if (self.state.isNew) self.setState({ screen: 'profileSetup', name: '', nameError: '', agree: false, agreeError: false });
-        else self.completeLogin('عبدالله الشهري', 'تم تسجيل الدخول بنجاح');
+        else self.completeLogin('عبدالله الشهري');
         return;
       }
       if (code === EXPIRED_CODE) { self.setState({ loading: false, otp: '', otpError: 'expired', seconds: 0 }); return; }
@@ -873,7 +872,7 @@ class Component extends DCLogic {
     });
   }
 
-  completeLogin(userName, msg) {
+  completeLogin(userName) {
     var origin = this.state.origin;
     var patch = { loggedIn: true, userName: userName, screen: DESTINATION[origin] || 'home', stubKind: origin, sheet: '', loading: false };
     if (!this.state.bookings.length && !this.state.isNew) {
@@ -885,7 +884,7 @@ class Component extends DCLogic {
     }
     if (origin === 'trip') patch = Object.assign(patch, this.bookingStart());
     if (origin === 'bookings') patch.bookingsTab = 'upcoming';
-    this.flash(patch, msg);
+    this.setState(patch);
   }
 
   submitProfile(e) {
@@ -897,7 +896,7 @@ class Component extends DCLogic {
     this.setState({ nameError: nameError, agreeError: agreeError });
     if (nameError || agreeError) return;
     this.setState({ loading: true });
-    this.later(800, function () { self.completeLogin(name, 'تم إنشاء حسابك بنجاح'); });
+    this.later(800, function () { self.completeLogin(name); });
   }
 
   openTermsPage(title) {

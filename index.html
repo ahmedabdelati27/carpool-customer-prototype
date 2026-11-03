@@ -2464,9 +2464,11 @@ body.standalone #device div:has(> svg[viewBox="9 0 375 60"]){display:none}
   window.addEventListener('resize', fit);
   fit();
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(function () {});
-  var app = DCLite.mount(document.getElementById('device'), document.getElementById('app-template').content, Component, { preset: preset, brandColor: brand });
-  // From the home-screen icon (?app=1) the splash plays like a tap on the app icon, then moves on to onboarding or home.
-  if (q.get('app') && preset === 'splash') app.renderVals().openApp();
+  // From the home-screen icon (?app=1) the app runs live (timers, toasts hiding) and opens like a tap on the launcher icon:
+  // splash, then onboarding or home. A ?preset other than live is a frozen design state.
+  var fromIcon = !!q.get('app') && (preset === 'splash' || preset === 'live');
+  var app = DCLite.mount(document.getElementById('device'), document.getElementById('app-template').content, Component, { preset: fromIcon ? 'live' : preset, brandColor: brand });
+  if (fromIcon) app.renderVals().openApp();
 })();
 </script>
 </body>
