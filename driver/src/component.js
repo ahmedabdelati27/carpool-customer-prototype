@@ -505,6 +505,17 @@ class Component extends DCLogic {
       self.setState({ loading: false, otp: '', attempts: attempts, otpError: attempts >= MAX_ATTEMPTS ? 'locked' : 'wrong' });
     });
   }
+  deleteBlockers() {
+    var s = this.state, d = s.data, items = [];
+    var booked = d.trips.filter(function (t) { return (t.status === 'upcoming' || t.status === 'current') && bookedSeats(s, t.id) > 0; }).length;
+    if (booked) items.push({ text: 'لديك ' + (booked === 1 ? 'رحلة قادمة عليها حجوزات' : booked === 2 ? 'رحلتان قادمتان عليهما حجوزات' : booked + ' رحلات قادمة عليها حجوزات') + '. أكملها أو ألغها أولاً.' });
+    var unpaid = d.trips.filter(function (t) { return t.status === 'completed' && (t.payout || 'payable') !== 'paid'; })
+      .reduce(function (n, t) { return n + tripEarn(s, t).net; }, 0);
+    if (unpaid > 0) items.push({ text: 'لديك مستحقات لم تُصرف بعد (' + money(unpaid) + '). ننتظر صرفها إلى حسابك البنكي.' });
+    var open = d.tickets.filter(function (t) { return t.status === 'new' || t.status === 'review'; });
+    if (open.length) items.push({ text: 'لديك طلب دعم أو اعتراض مفتوح (' + open[0].ref + ').' });
+    return items;
+  }
   login() {
     var k = this.state.kind;
     if (k === 'new') { this.setState({ screen: 'signup', suName: '', suNameErr: '', suAgree: false, suAgreeErr: false, prev: {} }); return; }
@@ -747,6 +758,7 @@ class Component extends DCLogic {
 
   renderVals() {
     var self = this, s = this.state, screen = s.screen;
+    var delBlockers = s.sheet === 'delete' ? this.deleteBlockers() : [];
     var motion = this._motion || (this._motion = { cur: screen, stack: [], anim: '' });
     if (motion.cur !== screen) {
       var TABS = { home: 1, trips: 1, earnings: 1, account: 1 };
@@ -1315,6 +1327,7 @@ class Component extends DCLogic {
       showNav: navOn, nav: nav, hasToast: !!s.toast, toast: s.toast,
       showSheet: !!s.sheet, isCitySheet: s.sheet === 'city', isCancelTripSheet: s.sheet === 'cancelTrip' && !!tdt, isRunSheet: s.sheet === 'run' && !!rt,
       isReportSheet: s.sheet === 'report', isLogoutSheet: s.sheet === 'logout',
+      isDeleteBlocked: s.sheet === 'delete' && delBlockers.length > 0, isDeleteSheet: s.sheet === 'delete' && delBlockers.length === 0, delBlockers: delBlockers,
       cancelSheet: { title: tdt && bookedSeats(s, tdt.id) ? 'إلغاء رحلة عليها حجوزات؟' : 'إلغاء الرحلة؟',
         body: tdt && bookedSeats(s, tdt.id) ? 'عليها حجوزات مؤكدة، لذلك لا يمكن تعديلها وأنت ملزم بتنفيذها. لو ألغيتها ستُلغى كل الحجوزات (' + tripBookings(s, tdt.id).length + ') ويُسترد للركاب 100%، ولا أرباح لك عنها، وتُسجَّل الواقعة لدى الإدارة.' : 'لا توجد حجوزات عليها، فستُحذف من نتائج البحث فوراً.' },
 
@@ -1391,6 +1404,10 @@ class Component extends DCLogic {
       uploadCar: function () { self.setState({ vehDraft: Object.assign(clone(vd), { carFile: vd.carFile ? 'car-photos-2.jpg' : 'car-photos.jpg' }), vehErr: Object.assign({}, ve, { car: false }) }); },
       saveVehicle: function () { self.saveVehicle(); },
       askLogout: function () { self.setState({ sheet: 'logout' }); },
+      askDelete: function () { self.setState({ sheet: 'delete' }); },
+      confirmDelete: function () {
+        self.flash(Object.assign(clone(BASE_STATE), { screen: 'phone', phone: '' }), 'استلمنا طلب حذف حسابك');
+      },
       confirmLogout: function () {
         self.flash(Object.assign(clone(BASE_STATE), { screen: 'phone', phone: '' }), 'تم تسجيل الخروج');
       },

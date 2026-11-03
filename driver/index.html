@@ -1295,7 +1295,7 @@ body.standalone #device div:has(> svg[viewBox="9 0 375 60"]){display:none}
   </sc-for>
 </div></div>
   </section>
-  <div style="background: #FFFFFF; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column"><button type="button" class="fv" onClick="{{askLogout}}" style="width: 100%; min-height: 56px; padding: 8px 16px; border: 0; background: #FFFFFF; color: #BF3B4B; font-size: 14px; line-height: 22px; font-weight: 500; display: flex; align-items: center; gap: 12px; text-align: start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: #BF3B4B; flex-shrink: 0"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M17.44 14.62L20 12.06 17.44 9.5M9.76 12.06h10.17M11.76 20c-4.42 0-8-3-8-8s3.58-8 8-8"></path></svg><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span>تسجيل الخروج</span></span></button></div>
+  <div style="background: #FFFFFF; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column"><button type="button" class="fv" onClick="{{askDelete}}" style="width: 100%; min-height: 56px; padding: 8px 16px; border: 0; background: #FFFFFF; color: #BF3B4B; font-size: 14px; line-height: 22px; font-weight: 500; display: flex; align-items: center; gap: 12px; text-align: start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: #BF3B4B; flex-shrink: 0"><path d="M21 5.98c-3.33-.33-6.68-.5-10.02-.5-1.98 0-3.96.1-5.94.3L3 5.98M8.5 4.97l.22-1.31C8.88 2.71 9 2 10.69 2h2.62c1.69 0 1.82.75 1.97 1.67l.22 1.3M18.85 9.14l-.65 10.07C18.09 20.78 18 22 15.21 22H8.79C6 22 5.91 20.78 5.8 19.21L5.15 9.14M10.33 16.5h3.33M9.5 12.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span>حذف الحساب</span></span></button></div>
 </div>
 </div>
 </sc-if>
@@ -1388,6 +1388,28 @@ body.standalone #device div:has(> svg[viewBox="9 0 375 60"]){display:none}
   </sc-for>
 </div>
       <button type="button" class="press fv" onClick="{{confirmReport}}" disabled="{{reportDisabled}}" style="width: 100%; height: 56px; border-radius: 9999px; border: 0; background: {{reportBg}}; color: {{reportColor}}; font-size: 16px; line-height: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0">إرسال البلاغ</button>
+    </sc-if>
+
+    <sc-if value="{{isDeleteBlocked}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; padding-top: 8px; text-align: center">
+        <span style="width: 72px; height: 72px; border-radius: 9999px; background: #FFF7E6; color: #D99100; display: flex; align-items: center; justify-content: center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink: 0"><path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10ZM12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M11.995 16h.009" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+        <div style="display: flex; flex-direction: column; gap: 4px"><h2 id="sheet-title" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">لا يمكن حذف حسابك الآن</h2><p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">أنهِ ما يلي أولاً، ثم أعد المحاولة.</p></div>
+        <ul style="list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 8px; text-align: start">
+          <sc-for list="{{delBlockers}}" as="db" hint-placeholder-count="2"><li style="padding: 12px 14px; border-radius: 16px; background: #F5F5F5; font-size: 14px; line-height: 22px">{{db.text}}</li></sc-for>
+        </ul>
+        <button type="button" class="press fv" onClick="{{closeSheet}}" style="width: 100%; height: 56px; border-radius: 9999px; border: 0; background: {{c.action}}; color: #FFFFFF; font-size: 16px; line-height: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0">حسناً</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isDeleteSheet}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; padding-top: 8px; text-align: center">
+        <span style="width: 72px; height: 72px; border-radius: 9999px; background: #FFEDF0; color: #BF3B4B; display: flex; align-items: center; justify-content: center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink: 0"><path d="M21 5.98c-3.33-.33-6.68-.5-10.02-.5-1.98 0-3.96.1-5.94.3L3 5.98M8.5 4.97l.22-1.31C8.88 2.71 9 2 10.69 2h2.62c1.69 0 1.82.75 1.97 1.67l.22 1.3M18.85 9.14l-.65 10.07C18.09 20.78 18 22 15.21 22H8.79C6 22 5.91 20.78 5.8 19.21L5.15 9.14M10.33 16.5h3.33M9.5 12.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+        <div style="display: flex; flex-direction: column; gap: 4px"><h2 id="sheet-title" style="margin: 0; font-size: 18px; line-height: 28px; font-weight: 700">حذف حسابك؟</h2><p style="margin: 0; font-size: 14px; line-height: 22px; color: #4B4B4B">سيُرسل طلب الحذف ويُسجَّل خروجك فوراً. يكتمل الحذف خلال 14 يوماً وتصلك رسالة نصية بذلك.</p></div>
+        <div style="width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+          <button type="button" class="press fv" onClick="{{closeSheet}}" style="height: 56px; border-radius: 9999px; border: 0; background: {{c.action}}; color: #FFFFFF; font-size: 16px; line-height: 24px; font-weight: 700">تراجع</button>
+          <button type="button" class="press fv" onClick="{{confirmDelete}}" style="height: 56px; border-radius: 9999px; border: 1px solid #BF3B4B; background: #FFFFFF; color: #BF3B4B; font-size: 16px; line-height: 24px; font-weight: 700">حذف الحساب</button>
+        </div>
+      </div>
     </sc-if>
 
     <sc-if value="{{isLogoutSheet}}" hint-placeholder-val="{{ false }}">
